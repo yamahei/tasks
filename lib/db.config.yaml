@@ -1,0 +1,10 @@
+production:
+  adapter:  postgresql
+  url: postgres://XXXX@ec2-50-19-109-120.compute-1.amazonaws.com:5432/DBNAME
+
+development:
+  adapter:  postgresql
+  host:     localhost
+  username: postgres
+  password: postgres
+  database: tasks

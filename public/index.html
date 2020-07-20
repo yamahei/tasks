@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>丼助 | sloppy planning</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+<!-- 
+    Templates
+ -->
+ <script type="text/x-template" id="PROJECT_DIALOG_TEMPLATE">
+    <div class="modal" :class="{ 'is-active': show_dialog }">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Project</p>
+                <button class="delete" @click="cancel" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div>
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" placeholder="Project name" v-model="local.name">
+                            <span class="icon is-small is-left"><i class="fa fa-tasks"></i></span>
+                        </div>
+                    </div>
+                    <div class="field is-grouped">
+                        <div class="control has-icons-left" style="width: 30%;">
+                            <input class="input" type="number" min="0" placeholder="Volume" v-model="local.volume">
+                            <span class="icon is-small is-left"><i class="fa fa-balance-scale"></i></span>
+                        </div>
+                        <div class="control has-icons-left" style="width: 33%;">
+                            <input class="input" type="date" placeholder="From" v-model="local.start">
+                            <span class="icon is-small is-left"><i class="fa fa-hourglass-start"></i></span>
+                        </div>
+                        <div class="control has-icons-left" style="width: 33%;">
+                            <input class="input" type="date" placeholder="To" v-model="local.last">
+                            <span class="icon is-small is-left"><i class="fa fa-hourglass-end"></i></span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <textarea class="textarea" rows="2" placeholder="Note: markdown is enabled." v-model="local.note"></textarea>
+                    </div>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <div style="width: 100%">
+                    <div class="is-pulled-left" v-show="show_remove">
+                        <button class="button is-danger" @click="remove">Delete</button>
+                    </div>
+                    <div class="is-pulled-right">
+                        <button class="button" @click="cancel">Cancel</button>
+                        <button class="button is-primary" @click="ok">OK</button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-template" id="MEMBER_DIALOG_TEMPLATE">
+    <div class="modal" :class="{ 'is-active': show_dialog }">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Member</p>
+                <button class="delete" @click="cancel" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div>
+                    <div class="field">
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" placeholder="Member name" v-model="local.name">
+                            <span class="icon is-small is-left"><i class="fa fa-user"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <div style="width: 100%">
+                    <div class="is-pulled-left" v-show="show_remove">
+                        <button class="button is-danger" @click="remove">Delete</button>
+                    </div>
+                    <div class="is-pulled-right">
+                        <button class="button" @click="cancel">Cancel</button>
+                        <button class="button is-primary" @click="ok">OK</button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-template" id="ASSIGN_MEMBER_DIALOG_TEMPLATE">
+    <div class="modal" :class="{ 'is-active': show_dialog }">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Assign Member</p>
+                <button class="delete" @click="cancel" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div ui="assign-candidate-member" v-for="member in list">
+                    <label>
+                        <input type="checkbox" class="checkbox" v-model="member.assigned"/>
+                        {{ member.name }}
+                    </label>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <div style="width: 100%">
+                    <div class="is-pulled-right">
+                        <button class="button" @click="cancel">Cancel</button>
+                        <button class="button is-primary" @click="ok">OK</button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-template" id="MODE_SWITCH_TEMPLATE">
+    <div class="field has-addons">
+        <p class="control">
+            <button class="button" :class="{'is-active': mode_is_project}" @click="switch_to_project">
+                <span class="icon is-small"><i class="fa fa-tasks"></i></span>
+                <span>Project</span>
+            </button>
+        </p>
+        <p class="control">
+            <button class="button" :class="{'is-active': mode_is_member}" @click="switch_to_member">
+                <span class="icon is-small"><i class="fa fa-user"></i></span>
+                <span>Member</span>
+            </button>
+        </p>
+    </div>
+</script>
+
+<script type="text/x-template" id="CALENDAR_TABLE_TEMPLATE">
+    <table ui="calendar-table" ref="content">
+        <tr ui="calendar-month-row">
+            <td v-for="month in months" :colspan="month.days" :title="month.label">{{ month.label }}</td>
+        </tr>
+        <tr ui="calendar-day-row">
+            <td v-for="day in days" :title="day.label" :style="getDayStyle(day)">{{ day.number }}</td>
+        </tr>
+    </table>
+</script>
+
+<script type="text/x-template" id="PROJECT_TABLE_TEMPLATE">
+    <div ui="assign-block" :style="project_style" ref="content">
+        <button class="button is-small is-pulled-right" @click="assign_member">
+            <span class="icon is-small"><i class="fa fa-users"></i></span>
+        </button>
+        <div ui="assigned-member" v-for="member in assigned_members">
+            {{ member.name }}
+        </div>
+    </div>
+</script>
+
+<script type="text/x-template" id="MEMBER_TABLE_TEMPLATE">
+    <div ui="member_project_container" ref="content">
+        <div ui="assign-block" :style="get_project_style(project)" v-for="project in assigned_projects">
+            <button class="button is-small is-pulled-right" @click="assign_member(project)">
+                <span class="icon is-small"><i class="fa fa-users"></i></span>
+            </button>
+            <div ui="assigned-project">
+                {{ project.name }}
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-template" id="TABLE_TITLE_CONTAINER">
+    <div ui="table-rowtitle" class="column is-3-withrange">
+        <slot></slot>
+    </div>
+</script>
+<script type="text/x-template" id="TABLE_BODY_CONTAINER">
+    <div ui="table-colcontainer" class="column">
+        <div ui="table-canvas" :style="canvas_width">
+            <slot></slot>
+        </div>
+    </div>
+</script>
+
+<script type="text/x-template" id="LOADER_TEMPLATE">
+    <div class="modal" :class="{ 'is-active': show_loader }">
+        <div class="modal-background"></div>
+        <div class="modal-content" style="overflow: visible !important;">
+            <p style="text-align: center; color: white;">
+                <i class="fa fa-refresh fa-spin fa-4x" aria-hidden="true"></i>
+            </p>
+        </div>
+    </div>
+</script>
+
+
+
+ <!--
+    App
+ -->
+<div id="app">
+    
+    <!-- Header -->
+    <section id="header" class="section">
+        <div class="container is-fluid">
+            <nav class="level">
+                <!-- Left side -->
+                <div class="level-left">
+                    <div class="level-item">
+                        <p class="title">丼助</p>
+                        <p class="subtitle">sloppy planning</p>
+                    </div>
+                </div>
+                <!-- Right side -->
+                <div class="level-right">
+                    <div ui="term-select" class="level-item">
+                        <div class="field has-addons">
+                            <p class="control">
+                                <a class="button" @click="on_basedate_to_prev">
+                                    <span class="icon is-small"><i class="fa fa-angle-double-left"></i></span>
+                                </a>
+                            </p>
+                            <p class="control">
+                                <input class="input" type="date" v-model="basedate.base" />
+                            </p>
+                            <p class="control">
+                                <a class="button" @click="on_basedate_to_forward">
+                                    <span class="icon is-small"><i class="fa fa-angle-double-right"></i></span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    <div ui="view-switch" class="level-item">
+                        <mode-switch
+                            :mode="mode"
+                            @change="on_change_mode"
+                        ></mode-switch>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Handle -->
+    <section id="content" class="section">
+        <div class="container is-fluid">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <h1 ui="view-label" class="subtitle" v-if="mode_is_project">Project View</h1>
+                        <h1 ui="view-label" class="subtitle" v-if="mode_is_member">Member View</h1>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <input ui="scroll-handle" type="range" v-model="scroll_per" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Table -->
+    <section id="table" class="section">
+        <div class="container is-fluid">
+            <!-- Calendar -->
+            <div ui="table-row" class="columns">
+                <table-title>
+                    <button class="button" @click="append_item">
+                        <span class="icon is-small"><i class="fa fa-plus"></i></span>
+                    </button>
+                </table-title>
+                <table-body :canvas_width="canvas_width">
+                    <calendar-table
+                        :base="basedate.base"
+                        :scroll_per="scroll_per"
+                        @change="on_change_basedate"
+                        @scroll="on_calendar_scroll"
+                    ></calendar-table>
+                </table-body>
+            </div>
+            <!-- Data: Project -->
+            <div ui="table-row" class="columns has-bottom" v-if="mode_is_project" v-for="project in projects">
+                <table-title>
+                    <p class="is-size-4">{{ project.name }}</p>
+                    <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
+                </table-title>
+                <table-body :canvas_width="canvas_width">
+                    <project-table
+                        :project="project"
+                        :basedate="basedate"
+                        :assigns="assigns"
+                        :hash_members="hash_members"
+                        :scroll_x="scroll_x"
+                        @assign="assign_member"
+                    ></project-table>
+                </table-body>
+            </div>
+            <!-- Data: Member -->
+            <div ui="table-row" class="columns has-bottom" v-if="mode_is_member" v-for="member in members_all">
+                <table-title>
+                    <p class="is-size-4">{{ member.name }}</p>
+                    <p class="is-size-7 link-like-text" @click="edit_member(member)">description</p>
+                </table-title>
+                <table-body :canvas_width="canvas_width">
+                    <member-table
+                        :member="member"
+                        :basedate="basedate"
+                        :assigns="assigns"
+                        :hash_projects="hash_projects"
+                        :scroll_x="scroll_x"
+                        @assign="assign_member"
+                    ></member-table>
+                </table-body>
+            </div>
+                
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <section id="footer" class="section">
+        <div class="container is-fluid">
+            TODO: Footer
+        </div>
+    </section>
+
+    <!-- Dialog -->
+    <member-dialog
+        :v-if="dialog.member.visible"
+        :visible="dialog.member.visible"
+        :member="dialog.member.member"
+        @append="on_append_member"
+        @edit="on_edit_member"
+        @remove="on_remove_member"
+        @cancel="close_member_dialog"
+    ></member-dialog>
+    <project-dialog
+        :v-if="dialog.project.visible"
+        :visible="dialog.project.visible"
+        :project="dialog.project.project"
+        @append="on_append_project"
+        @edit="on_edit_project"
+        @remove="on_remove_project"
+        @cancel="close_project_dialog"
+    ></project-dialog>
+
+    <assign-member-dialog
+        :v-if="dialog.assign_member.visible"
+        :visible="dialog.assign_member.visible"
+        :project="dialog.assign_member.project"
+        :members_all="dialog.assign_member.members_all"
+        :members="dialog.assign_member.members"
+        @regist="on_regist_assign_member"
+        @cancel="close_assign_member_dialog"
+    ></assign-member-dialog>
+
+    <loader :visible="loader.visible"></loader>
+
+    <script>
+        //const
+        const DATE_RANGE_PREV = 14;//基準日から何日過去まで読み込むか
+        const DATE_RANGE_FORE = 62;//基準日から何日未来まで読み込むか
+        const MODE_PROJECT = "MODE_PROJECT"; 
+        const MODE_MEMBER = "MODE_MEMBER"; 
+        const A_DAY = 1000 * 60 * 60 * 24;//1日分のミリ秒
+        const REDIUS_ZERO = "0px";
+        const REDIUS_LARGE = "12px";
+    </script>
+
+    <!-- http://www.enjoyxstudy.com/javascript/dateformat/ -->
+    <script src="js/dateformat.js"></script>
+    <script src="js/util.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+    <script>
+        //debug
+        Vue.config.devtools = true;
+    </script>
+    <script src="js/components/loader.js"></script>
+    <script src="js/components/member-dialog.js"></script>
+    <script src="js/components/project-dialog.js"></script>
+    <script src="js/components/assign-member-dialog.js"></script>
+    <script src="js/components/mode-switch.js"></script>
+    <script src="js/components/calendar-table.js"></script>
+    <script src="js/components/table-container.js"></script>
+    <script src="js/components/project-table.js"></script>
+    <script src="js/components/member-table.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.js" integrity="sha512-VGxuOMLdTe8EmBucQ5vYNoYDTGijqUsStF6eM7P3vA/cM1pqOwSBv/uxw94PhhJJn795NlOeKBkECQZ1gIzp6A==" crossorigin="anonymous"></script>
+    <script src="js/api.js"></script>
+    <script src="js/tasks.js"></script>
+
+    <script src="js/app.js"></script>
+
+</div>
+</body>
+</html>

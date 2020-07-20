@@ -1,0 +1,98 @@
+.link-like-text {
+    color: blue;
+    text-decoration: underline;
+}
+.column.is-3-withrange {
+    flex: none;
+    width: 25%;
+    min-width: 12rem;
+    max-width: 24rem;
+}
+
+/*
+ * Header
+ */
+
+#header.section {
+    padding-top: 1rem;
+}
+
+/*
+ * Content
+ */
+#content.section {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/*
+ * Table
+ */
+/** */
+*[ui='calendar-table'] {
+    margin: 0; padding: 0;
+    border-collapse: collapse;
+}
+*[ui='calendar-table'] td {
+    border: solid 1px gray;
+}
+*[ui='calendar-table'] *[ui='calendar-month-row'] td {
+    padding-left: 0.5rem;
+    background-color: white;
+}
+*[ui='calendar-table'] *[ui='calendar-day-row'] td {
+    width: 3rem;
+    text-align: center;
+}
+
+/** */
+*[ui='assign-candidate-member'] {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.25rem;
+}
+*[ui='assign-candidate-member']:hover {
+    background-color: gainsboro;
+}
+*[ui='assigned-member'] {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.25rem;
+}
+
+#table.section {
+    padding-top: 1rem;
+}
+#table *[ui='table-row']{
+    padding: 0;
+}
+#table *[ui='table-row'].has-bottom:not(:last-child) {
+    border-bottom: dotted 1px silver;
+    margin-bottom: 2.5rem;
+}
+#table *[ui='table-rowtitle']{}
+#table *[ui='table-colcontainer']{
+    padding: 0;
+    overflow: hidden;
+}
+#table *[ui='table-canvas']{
+    margin: 0;
+    padding: 0.25rem 0;
+    /* 7日前～31日後：各2rem */
+    /* width: calc(2rem * (31 - (-7))); */
+}
+#table *[ui='assign-block']{
+    margin: 0; margin-bottom: 0.25rem;
+    padding: 0.5rem 1rem;
+    background-color: silver;
+    border: solid 1px gray;
+}
+#table *[ui='member-item']{
+    margin: 0.25rem;
+    padding: 0.25rem;
+}
+
+
+/*
+ * Footer
+ */

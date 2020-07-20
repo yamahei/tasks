@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8">
+    <title>アプリ | 帰省人 - kisejin</title>
+    <link rel="shortcut icon" href="/img/icon_s.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/bulma.0.7.2.min.css" />
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"> -->
+    <link rel="stylesheet" href="/css/onsenui.css">
+    <link rel="stylesheet" href="/css/onsen-css-components.min.css">
+    <link rel="stylesheet" href="/css/app.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-139098582-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-139098582-1');
+    </script>
+
+  </head>
+
+  <body>
+    <div id="templates">
+      <script type="text/x-template" id="XX_TEMPLATE">
+      </script><!--#XX_TEMPLATE-->
+
+      <script type="text/x-template" id="LOADING_TEMPLATE">
+        <v-ons-modal v-bind:visible="loader.visible">
+          <p style="text-align: center">
+            <i class="fa fa-refresh fa-spin fa-3x" aria-hidden="true"></i>
+          </p>
+        </v-ons-modal>
+      </script><!--#LOADING_TEMPLATE-->
+      <script type="text/x-template" id="QR_TEMPLATE">
+        <v-ons-modal v-bind:visible="qr.visible" v-on:click="qr.visible=false">
+          <div style="padding: 2em; text-align: center">
+            <p v-if="qr.message" style="font-size: 200%;">{{ qr.message }}</p>
+            <figure class="image is-square upper-margin-1rem">
+              <qrcode v-model="qr.url" tag="img"></qrcode>
+            </figure>  
+            <div class="field has-addons upper-margin-1rem">
+              <div class="control">
+                <input class="input" type="text" v-model="qr.url" readonly>
+              </div>
+              <div class="control">
+                <a class="copy-url button is-info"
+                  :data-clipboard-text="qr.url">Copy</a>
+              </div>
+            </div>
+          </div>
+        </v-ons-modal>
+      </script><!--#QR_TEMPLATE-->
+
+
+    </div><!--#templates-->
+
+    <div id="wrapper">
+
+    
+    <template id="page1">
+      <v-ons-page>
+        <v-ons-toolbar>
+          <div class="center">Page 1</div>
+        </v-ons-toolbar>
+        <p style="text-align: center">
+          This is the first page
+          <v-ons-button @click="push">Push Page 2</v-ons-button>
+        </p>
+      </v-ons-page>
+    </template>
+      
+    <template id="page2">
+      <v-ons-page>
+        <v-ons-toolbar>
+          <div class="left">
+            <v-ons-back-button>Page 1</v-ons-back-button>
+          </div>
+          <div class="center">Page 2</div>
+        </v-ons-toolbar>
+        <p style="text-align: center">This is the second page</p>
+      </v-ons-page>
+    </template>
+
+    <template id="table">
+      <v-ons-page>
+        <div class="container">
+          <h1 class="title">{{ plan.title }}</h1>
+          <p class="subtitle">{{ getFromToStr(plan) }}</p>
+        </div>
+
+        <div class="table-frame">
+
+          <table class="events table" v-if="friends.length > 0">
+            <tr class="friends">
+              <th class="member" v-for="member in friends">
+                <div class="face">{{ member.face }}</div><!--v-on:click="showChangeMeDialog(member)" -->
+                <p class="">{{ member.name }}</p>
+              </th>
+            </tr>
+            <tr class="timeline">
+              <td v-bind:colspan="friends.length">
+                <div v-for="day, index in getAllDays()"
+                  v-on:click="createEvent(day)"
+                  v-bind:class="{date: true, blue: isBlue(day), red: isRed(day), today: isToday(day)}">
+                  {{ appDateStr(day, index) }}
+                </div>
+                <div class="event" v-for="event in getAllEvents()"
+                  v-bind:style="getEventStyle(event)" v-on:click="showEvent(event.org)">
+                  {{event.title}}
+                </div>
+              </td>
+            </tr>
+          </table>
+
+        </div>
+        <v-ons-speed-dial position="bottom right" direction="up"><!--閉じた状態の始まらないので。。-->
+          <v-ons-fab>
+            <i class="fa fa fa-bars" aria-hidden="true"></i>
+          </v-ons-fab>
+          <v-ons-speed-dial-item>
+            <i class="fa fa-2x fa-share-alt" aria-hidden="true"
+              v-on:click="qr.visible = !qr.visible"></i>
+          </v-ons-speed-dial-item>
+          <v-ons-speed-dial-item>
+              <i class="fa fa-2x fa-cloud-download" aria-hidden="true"
+              v-on:click="reload()"></i>
+          </v-ons-speed-dial-item>
+          <v-ons-speed-dial-item>
+            <i class="fa fa-2x fa-user" aria-hidden="true"
+              v-on:click="showChangeMeDialog()"></i>
+          </v-ons-speed-dial-item>
+        </v-ons-speed-dial>
+  
+        <!-- イベント登録,編集,参照ダイアログ -->
+        <v-ons-dialog :visible.sync="eventmodal.visible" v-bind:cancelable="true">
+          <div class="input-dialog">
+            <p>
+              <v-ons-input class="input" type="text" maxlength="256"
+                v-model="eventmodal.event.title"
+                v-bind:disabled="!eventmodal.ismine"></v-ons-input>
+            </p>
+            <p class="upper-margin-1rem">
+              <v-ons-input class="input" type="date"
+              v-model="eventmodal.event.date" v-bind:disabled="!eventmodal.ismine"
+              v-bind:min="plan.from" v-bind:max="plan.to"
+              ></v-ons-input>
+            </p>
+            <p class="upper-margin-1rem">
+              <!-- <label class="label">時間帯</label> -->
+              <div class="field is-grouped">
+                <p class="control">
+                  <div class="buttons has-addons">
+                    <span v-bind:class="getEventButtonStyle('all')" v-on:click="setEventAt('all')">終日</span>
+                    <span v-bind:class="getEventButtonStyle('day')" v-on:click="setEventAt('day')">日中</span>
+                  </div>      
+                </p>
+                <p class="control">
+                  <div class="buttons has-addons">
+                    <span v-bind:class="getEventButtonStyle('am')" v-on:click="setEventAt('am')">AM</span>
+                    <span v-bind:class="getEventButtonStyle('pm')" v-on:click="setEventAt('pm')">PM</span>
+                    <span v-bind:class="getEventButtonStyle('night')" v-on:click="setEventAt('night')">夜</span>
+                  </div>
+                </p>
+              </div>
+            </p>
+
+            <div class="field is-grouped is-grouped-centered">
+              <p class="control">
+                <button class="button is-danger is-small"
+                  v-if="eventmodal.event.friend_id && eventmodal.ismine" v-on:click="removeEvent()">
+                  削除
+                </button>  
+              </p>
+              <p class="control is-expanded">
+                <button class="button is-primary is-fullwidth"
+                  v-if="!eventmodal.event.friend_id" v-on:click="appendEvent()">
+                  登録する
+                </button>  
+                <button class="button is-primary is-fullwidth"
+                  v-if="eventmodal.event.friend_id && !eventmodal.ismine" v-on:click="appendEvent()">
+                  コピーする
+                </button>  
+                <button class="button is-primary is-fullwidth"
+                  v-if="eventmodal.event.friend_id && eventmodal.ismine" v-on:click="updateEvent()">
+                  更新する
+                </button>  
+              </p>
+            </div>
+          </div><!--input-dialog-->
+        </v-ons-dialog>
+
+        <!-- 自分登録ダイアログ -->
+        <v-ons-dialog :visible.sync="registmodal.visible" v-bind:cancelable="registmodal.newcomer === false">
+          <div class="input-dialog">
+            <p>
+              <v-ons-row>
+                <v-ons-col width="1.5rem" vertical-align="center">
+                  <span v-on:click="resetMyFace()">{{ registmodal.myface }}</span>
+                </v-ons-col>
+                <v-ons-col>
+                  <v-ons-input class="input" type="text" maxlength="8" v-model="registmodal.myname"></v-ons-input>
+                </v-ons-col>
+              </v-ons-row>
+            </p>
+            <p class="upper-margin-1rem">
+              <button class="button is-primary is-fullwidth"
+                v-if="registmodal.newcomer === true"
+                v-bind:disabled="isJoinable()==false" v-on:click="join()">
+                {{ plan.title }}に参加する
+              </button>
+              <div class="field is-grouped is-grouped-centered"
+                v-if="registmodal.newcomer === false">
+                <p class="control">
+                  <button class="button is-danger is-small" v-on:click="confirmLeave()">
+                    離脱
+                  </button>  
+                </p>
+                <p class="control is-expanded">
+                  <button class="button is-primary is-fullwidth"
+                    v-bind:disabled="isJChangable()==false" v-on:click="changeMe()">
+                    変更する
+                  </button>
+                </p>
+              </div>
+            </p>
+          </div><!--input-dialog-->
+        </v-ons-dialog>
+
+        <!-- 参加モーダル -->
+        <v-ons-modal class="join-modal" :visible.sync="joindialog.visible">
+          <h1>{{ plan.title }}</h1>
+          <p>に参加しますか？</p>
+          <p class="upper-margin-1rem buttons is-centered">
+            <a class="button is-small is-danger"
+              v-on:click="notJoin()">参加しない</a>
+            <a class="button is-primary is-medium"
+            v-on:click="acceptJoin()">参加する</a>
+          </p>
+        </v-ons-modal>
+
+        <!-- components -->
+        <my-loader v-bind:loader="loader"></my-loader>
+        <my-qrcode v-bind:qr="qr"></my-qrcode>
+
+        <footer>
+          <p class="copy">kisejin (c)2019</p>
+          <ul>
+            <li><a target="_self" href="/index.html">HOME</a></li>
+            <li><a target="_self" href="/app">イベントカレンダーの作成</a></li>
+            <!-- <li><a target="_blank" href="/help.html">取扱説明書</a></li> -->
+            <li><a target="_blank" href="/kiyaku.html">利用規約</a></li>
+            <li><a target="_blank" href="https://suzuri.jp/yamaoriippei/1749201/t-shirt/s/white">オリジナルグッズ</a></li>
+          </ul>
+        </footer>
+      
+      </v-ons-page>
+    </template>
+  
+    <template id="create">
+      <v-ons-page>
+
+        <section class="section">
+          <div class="container">
+            <p class="title">帰省人</p>
+            <p class="subtitle">新感覚 使い捨てる共有カレンダー</p>
+          </div>
+
+          <div class="field-body full-btn-container">
+            <div class="field">
+              <div class="control">
+                <button class="button is-primary is-fullwidth"
+                  v-on:click="showCreateDialog()">
+                  イベントカレンダーを作成する
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div v-if="plans.length > 0">
+              <h2>参加中のイベント</h2>
+              <ul class="my-event-list">
+                <li v-for="item in plans" >
+                  <a v-bind:href="getPlanUrl(item)">
+                    {{ item.title }}({{ getFromToStr(item) }})
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- <div class="field-body full-btn-container">
+            <div class="field">
+              <div class="control">
+                <button class="button is-normal is-fullwidth"
+                  v-on:click="showCreateDialog()">
+                  取扱説明書
+                </button>
+              </div>
+            </div>
+          </div> -->
+
+          <!-- カレンダ作成モーダル -->
+          <v-ons-dialog :visible.sync="createDialog.visible" v-bind:cancelable="true">
+            <div class="input-dialog">
+              <p>
+                <v-ons-input class="input" type="text" maxlength="32" v-model="createDialog.plan.title"></input>
+              </p>
+              <p class="upper-margin-1rem">
+                <label class="label">
+                  <span>滞在期間</span>
+                  <span>({{ getDateRangeStr() }})</span>
+                </label>
+                <p class="control">
+                  <v-ons-input class="input" type="date" placeholder="From"
+                    v-model="createDialog.plan.from" v-bind:min="getPlanFromMin()" v-bind:max="getPlanFromMax()"
+                    v-on:change="onChangePlanFrom()"></input>
+                </p>
+                <p class="control">
+                  <v-ons-input class="input" type="date" placeholder="To"
+                    v-model="createDialog.plan.to" v-bind:min="getPlanToMin()" v-bind:max="getPlanToMax()"
+                    ></input>
+                </p>
+              </p>
+              <p class="upper-margin-1rem">
+                <button class="button is-primary is-fullwidth"
+                  v-on:click="createCalender()">
+                  イベントカレンダーを作成する
+                </button>
+              </p>  
+            </div><!--input-dialog-->
+          </v-ons-dialog>
+
+          <div class="create_event_form">
+
+
+          </div><!--create_event_form-->
+
+        </section>
+        <!-- components -->
+        <my-loader v-bind:loader="loader"></my-loader>
+        <!-- <my-qrcode v-bind:qr="qr"></my-qrcode>
+        <button v-on:click="qr.visible = !qr.visible">QR</button> -->
+
+      </v-ons-page>
+    </template>
+  
+    <template id="main">
+      <v-ons-navigator swipeable
+        :page-stack="pageStack"
+        @push-page="pageStack.push($event)"
+      ></v-ons-navigator>
+    </template>
+      
+  
+    <div id="app"></div>
+
+
+  </div>
+    
+    <!-- script -->
+    <script src="/lib/vue.2.5.17.js"></script>
+    <script src="/lib/onsenui.min.js"></script>
+    <script src="/lib/vue-onsenui.js"></script>
+    <script src="/lib/vue-qrcode.js"></script>
+    <script src="/lib/axios.0.18.0.min.js"></script>
+    <script src="/lib/clipboard.min.js"></script>
+    <script src="/js/app.js"></script>
+    
+  </body>
+
+</html>
