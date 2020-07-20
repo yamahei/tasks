@@ -27,4 +27,4 @@ bundle exec ruby app.rb
 
 ## 現状とか今後
 
-[doc/phase00.md]を参照
+[document/phase00.md]を参照

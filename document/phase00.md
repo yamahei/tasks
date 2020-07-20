@@ -1,0 +1,100 @@
+# Phase 0: 4連休の自由研究
+
+* つい発想が発展して完成したことがなかったので、ミニマムでも完成を目指す
+* 最低限の運用（自分利用）に耐える
+* ログインとかアカウントとかも二の次
+
+## データ構造
+
+* ほんとに最低限
+* PlantUMLで見れる
+   * [オンラインサーバ](http://www.plantuml.com/plantuml/uml/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000)
+
+今のデータ構造（ホントに最低限
+```plantuml
+@startuml
+  entity "Member" AS M
+  entity "Project" AS P
+  entity "Assign" AS A
+
+  M ..{ A
+  P ..{ A
+@enduml
+```
+
+あちこちに発展できそうで困る
+```plantuml
+@startuml
+  entity "Member" AS M
+  entity "Project" AS P
+  entity "Assign" AS A
+
+  M ..{ A
+  P ..{ A
+
+  entity "Skill" AS S
+  entity "Organization" AS O
+
+  S }.. M
+  O }.. M
+
+  entity "Product" AS D
+  entity "Customer" AS C
+
+  D }.. P
+  C }.. D
+
+  entity "Work" AS W
+
+  W }.. A
+@enduml
+```
+
+
+## 操作
+
+### 共通
+
+* 基準日
+   * 日付範囲の基準になる日
+   * 「14日前～基準日～62日後」を表示
+   * [≪][≫]で7日ずつ前後する
+* モードスイッチ
+   * ビューの切り替え（Project/Member）
+* スクロール
+* カレンダー
+
+### プロジェクトビュー
+
+* [＋]：プロジェクトの新規追加
+* [description]：プロジェクトの詳細（編集）
+* [👪]：アサインメンバーの編集
+
+### メンバービュー
+
+* [＋]：メンバーの新規追加
+* [description]：メンバーの詳細（編集）
+* [👪]：アサインメンバーの編集
+
+## TODO:
+
+### 仕様的なこと
+
+* project.noteはmarkdownに対応させたい
+   * Wikiトップページ的に機能させたい
+* メンバーにアサイン期間設定したい
+   * member.start, member.last
+   * NULLのときproject.start, project.last
+* データから類推できる（やってない
+   * 大まかな月次の稼働（売上
+   * 将来的な稼働予定
+
+
+### 開発的なこと
+
+* 開発コード「丼助（どんぶりスケジュール）」はこの先…？
+* Activerecordマイグレーションに対応させたい
+* RSpecに移行したい
+   * db/test.rbが変更に追随できてない
+* Rake入れてない
+* VueはCLIでやるべきなの？
