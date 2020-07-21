@@ -62,7 +62,6 @@
 * モードスイッチ
    * ビューの切り替え（Project/Member）
 * スクロール
-   * トラックパッド2本指の横スクロールに対応できてない
 * カレンダー
 
 ### プロジェクトビュー
@@ -83,6 +82,7 @@
 
 * project.noteはmarkdownに対応させたい
    * Wikiトップページ的に機能させたい
+* トラックパッド2本指の横スクロールに対応できてない
 * メンバーにアサイン期間設定したい
    * member.start, member.last
    * NULLのときproject.start, project.last
