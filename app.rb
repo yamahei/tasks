@@ -149,6 +149,18 @@ class MyApp < Sinatra::Base
         biz.delete_assign(params[:id])
         200
     end
+    post '/api/assigns/edit' do#=>[Assign] *created
+        assign_type = Dry::Schema.Params do
+            optional(:id).maybe(:integer)
+            required(:project_id).filled(:integer)
+            required(:member_id).filled(:integer)
+        end
+        validates{ params{
+            required(:delete_list).value(:array).each(assign_type)
+            required(:create_list).value(:array).each(assign_type)
+        }}
+        biz.edit_assign(params[:delete_list], params[:create_list]).to_json
+    end
 
 end
 

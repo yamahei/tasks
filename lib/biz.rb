@@ -103,6 +103,14 @@ class Biz
         db_assign.destroy
         nil
     end
+    def edit_assign delete_list, create_list
+        delete_list.each{|item|
+            delete_assign(item[:id])
+        }
+        create_list.map{|item| #returns created assigns
+            create_assign(item[:project_id], item[:member_id])
+        }
+    end
 
     #
     # Mixed

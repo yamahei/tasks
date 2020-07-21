@@ -288,7 +288,7 @@
                 </table-body>
             </div>
             <!-- Data: Project -->
-            <div ui="table-row" class="columns has-bottom" v-if="mode_is_project" v-for="project in projects">
+            <div ui="table-row" class="columns has-bottom" v-if="mode_is_project" v-for="project in sorted_projects">
                 <table-title>
                     <p class="is-size-4">{{ project.name }}</p>
                     <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>

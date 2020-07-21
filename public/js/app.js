@@ -73,6 +73,19 @@
             },
             mode_is_project: function(){ return !!(this.mode == MODE_PROJECT); },
             mode_is_member: function(){ return !!(this.mode == MODE_MEMBER); },
+            sorted_projects: function(){
+                return this.projects.sort(function(a, b){
+                    if(a.name == b.name){
+                        return a.id * 1 - b.id * 1;
+                    }else if(a.name < b.name){
+                        return -1;
+                    }else if(a.name > b.name){
+                        return 1;
+                    }else{
+                        return 0;
+                    }
+                });
+            },
         },
         beforeMount: function(){
             //デバッグ用かも
@@ -154,7 +167,7 @@
                 }
             },
             /**
-             * Project View
+             * Assign
              */
             get_assigned_members: function(project){
                 //TODO: project-table内で重複⇒Biz化必要？
@@ -179,52 +192,55 @@
                 const project_id = $event.project.id;
                 const new_member_ids = $event.assigns.map(function(member){ return member.id; }).sort();
                 const old_member_ids = this.dialog.assign_member.members.map(function(member){ return member.id; }).sort();
-                let n = new_member_ids.shift();
-                let o = old_member_ids.shift();
+                const append_list = [];
+                const delete_list = [];
+                let new_mid = new_member_ids.shift();
+                let old_mid = old_member_ids.shift();
                 while(true){
-                    if(n === undefined && o === undefined){//終わり
+                    if(new_mid === undefined && old_mid === undefined){//終わり
                         break;
-                    }else if(n === o){//両方に存在⇒何もしない
-                        n = new_member_ids.shift();
-                        o = old_member_ids.shift();
-                    }else if(n === undefined && o !== undefined){//oのみ存在⇒o削除
-                        this.async_delete_assign(project_id, o);
-                        o = old_member_ids.shift();
-                    }else if(n !== undefined && o === undefined){//nのみ存在⇒n追加
-                        this.async_append_assign(project_id, n);
-                        n = new_member_ids.shift();
-                    }else if(n > o){//oにあってnにない⇒o削除
-                        this.async_delete_assign(project_id, o);
-                        o = old_member_ids.shift();
-                    }else if(n < o){//nにあってoにない⇒n追加
-                        this.async_append_assign(project_id, n);
-                        n = new_member_ids.shift();
+                    }else if(new_mid === old_mid){//両方に存在⇒何もしない
+                        new_mid = new_member_ids.shift();
+                        old_mid = old_member_ids.shift();
+                    }else if(new_mid === undefined && old_mid !== undefined){//oのみ存在⇒o削除
+                        delete_list.push({project_id: project_id, member_id: old_mid});
+                        old_mid = old_member_ids.shift();
+                    }else if(new_mid !== undefined && old_mid === undefined){//nのみ存在⇒n追加
+                        append_list.push({project_id: project_id, member_id: new_mid});
+                        new_mid = new_member_ids.shift();
+                    }else if(new_mid > old_mid){//oにあってnにない⇒o削除
+                        delete_list.push({project_id: project_id, member_id: old_mid});
+                        old_mid = old_member_ids.shift();
+                    }else if(new_mid < old_mid){//nにあってoにない⇒n追加
+                        append_list.push({project_id: project_id, member_id: new_mid});
+                        new_mid = new_member_ids.shift();
                     }
                 };
-                this.close_assign_member_dialog();
-            },
-            async_append_assign: function(project_id, member_id){
                 const self = this;
-                API.async_append_assign(project_id, member_id)
+                const callback = function(){
+                    self.close_assign_member_dialog();
+                };
+                this.edit_assigns(append_list, delete_list, callback);
+            },
+            edit_assigns: function(append_list, delete_list, callback){
+                const self = this;
+                const deletes = delete_list.map(function(item){
+                    return self.assigns.find(function(assign){
+                        return assign.project_id == item.project_id && assign.member_id == item.member_id;
+                    });
+                });
+                API.edit_assign(deletes, append_list)
                 .then(function(response){
-                    const assign = response.data;
-                    self.assigns.push(assign);
-                });
-            },
-            async_delete_assign: function(project_id, member_id){
-                const self = this;
-                const assign = this.assigns.find(function(assign){
-                    return assign.project_id == project_id && assign.member_id == member_id;
-                });
-                if(assign){
-                    const index = this.assigns.indexOf(assign);
-                    if(index >= 0){
-                        API.async_delete_assign(assign.id)
-                        .then(function(){
+                    appendeds = response.data;
+                    deletes.forEach(function(assign){
+                        const index = self.assigns.indexOf(assign);
+                        if(assign && index >= 0){
                             self.assigns.splice(index, 1);
-                        });
-                    }
-                }
+                        }
+                    });
+                    self.assigns.splice(0, 0, ...appendeds);
+                    callback();
+                });
             },
             close_assign_member_dialog: function(){
                 this.dialog.assign_member.visible = false;
@@ -246,7 +262,6 @@
             //メンバー編集ダイアログ
             append_member: function(){ this.open_member_dialog(null); },
             edit_member: function(member){ this.open_member_dialog(member); },
-            //--
             open_member_dialog: function(member){
                 this.dialog.member.member = member;
                 this.dialog.member.visible = true;
@@ -293,7 +308,6 @@
             //プロジェクト編集ダイアログ
             append_project: function(){ this.open_project_dialog(null); },
             edit_project: function(project){ this.open_project_dialog(project); },
-            //--
             open_project_dialog: function(project){
                 this.dialog.project.project = project;
                 this.dialog.project.visible = true;
@@ -316,9 +330,6 @@
                 .then(function(response){
                     const new_project = response.data;
                     const old_project = self.hash_projects[project.id];
-                    // const old_project = self.projects.find(function(p){
-                    //     return p.id === project.id;
-                    // });
                     if(old_project){
                         old_project.name = new_project.name;
                         old_project.note = new_project.note;

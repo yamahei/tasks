@@ -97,16 +97,24 @@
     };
 
     //Assign
-    api.prototype.async_append_assign = async function(project_id, member_id){
+    api.prototype.append_assign = function(project_id, member_id){
         const url = ASSIGN_BASE_URI;
         const params = { project_id: project_id, member_id: member_id };
-        return await axios.put(url, params);
+        return axios.put(url, params);
     };
-    api.prototype.async_delete_assign = async function(id){
+    api.prototype.delete_assign = function(id){
         const url = ASSIGN_BASE_URI;
         const params = new URLSearchParams();//deleteのときはbodyで渡せない
         params.append("id", id);
-        return await axios.delete(url, {data: params});
+        return axios.delete(url, {data: params});
+    };
+    api.prototype.edit_assign = function(delete_list, create_list){
+        const url = `${ASSIGN_BASE_URI}/edit`;
+        const params = {
+            delete_list: delete_list,
+            create_list: create_list,
+        }
+        return axios.post(url, params);
     };
     
 
