@@ -250,7 +250,7 @@
     </section>
 
     <!-- Handle -->
-    <section id="content" class="section">
+    <section id="handle" class="section">
         <div class="container is-fluid">
             <div class="level">
                 <div class="level-left">
@@ -287,24 +287,33 @@
                     ></calendar-table>
                 </table-body>
             </div>
+        </div>
+    </section>
+    <section id="table" class="section">
+        <div class="container is-fluid">
+        
             <!-- Data: Project -->
-            <div ui="table-row" class="columns has-bottom"
-                v-if="mode_is_project" v-for="project in sorted_projects" v-bind:key="project.id">
-                <table-title>
-                    <p class="is-size-4">{{ project.name }}</p>
-                    <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
-                </table-title>
-                <table-body :canvas_width="canvas_width">
-                    <project-table
-                        :project="project"
-                        :basedate="basedate"
-                        :assigns="assigns"
-                        :hash_members="hash_members"
-                        :scroll_x="scroll_x"
-                        @assign="assign_member"
-                    ></project-table>
-                </table-body>
-            </div>
+            <template v-if="mode_is_project" v-for="(project, index) in sorted_projects">
+                <div class="columns" v-if="is_next_project_group(sorted_projects[index - 1], project)">
+                    <div class="column" ui="group-header">{{ get_project_group(project) }}</div>
+                </div>
+                <div ui="table-row" class="columns has-bottom" v-bind:key="project.id">
+                    <table-title>
+                        <p class="is-size-4">{{ project.name }}</p>
+                        <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
+                    </table-title>
+                    <table-body :canvas_width="canvas_width">
+                        <project-table
+                            :project="project"
+                            :basedate="basedate"
+                            :assigns="assigns"
+                            :hash_members="hash_members"
+                            :scroll_x="scroll_x"
+                            @assign="assign_member"
+                        ></project-table>
+                    </table-body>
+                </div>
+            </template>
             <!-- Data: Member -->
             <div ui="table-row" class="columns has-bottom"
                 v-if="mode_is_member" v-for="member in members_all" v-bind:key="member.id">
@@ -372,7 +381,8 @@
         const DATE_RANGE_FORE = 62;//基準日から何日未来まで読み込むか
         const MODE_PROJECT = "MODE_PROJECT"; 
         const MODE_MEMBER = "MODE_MEMBER"; 
-        const A_DAY = 1000 * 60 * 60 * 24;//1日分のミリ秒
+        const A_DAY_WIDTH = "24px";//1日分のカレンダー幅
+        const A_DAY_MSEC = 1000 * 60 * 60 * 24;//1日分のミリ秒
         const REDIUS_ZERO = "0px";
         const REDIUS_LARGE = "12px";
     </script>

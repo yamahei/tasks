@@ -38,10 +38,10 @@
                 const project = this.project;
 
                 if(!basedate.start || !basedate.last){ return; }
-                const app_start = +basedate.start / A_DAY;
-                const app_last = +basedate.last / A_DAY;
-                const pj_start = +(new Date(project.start)) / A_DAY;
-                const pj_last = +(new Date(project.last)) / A_DAY;
+                const app_start = +basedate.start / A_DAY_MSEC;
+                const app_last = +basedate.last / A_DAY_MSEC;
+                const pj_start = +(new Date(project.start)) / A_DAY_MSEC;
+                const pj_last = +(new Date(project.last)) / A_DAY_MSEC;
                 const is_left_over = !!(app_start > pj_start);
                 const is_right_over = !!(app_last < pj_last);
                 const x1 = is_left_over ? 0 : (pj_start - app_start);
@@ -51,8 +51,8 @@
                 const radius_right = is_right_over ? REDIUS_ZERO : REDIUS_LARGE;
                 return {
                     "position": "relative",
-                    "left": `calc(2rem * ${x1})`,
-                    "width": `calc(2rem * ${w})`,
+                    "left": `calc(${A_DAY_WIDTH} * ${x1})`,
+                    "width": `calc(${A_DAY_WIDTH} * ${w})`,
                     "border-radius": `${radius_left} ${radius_right} ${radius_right} ${radius_left}`,
                 };
 

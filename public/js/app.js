@@ -50,7 +50,7 @@
         data: state,
         computed: {
             canvas_width: function(){
-                return `width: calc(2rem * (${DATE_RANGE_FORE} + ${DATE_RANGE_PREV}));`
+                return `width: calc(${A_DAY_WIDTH} * (${DATE_RANGE_FORE} + ${DATE_RANGE_PREV}));`
             },
             hash_members: function(){
                 if(!this.members_all){ return null; }
@@ -144,10 +144,12 @@
              */
             on_change_mode: function($event){
                 const self = this;
-                this.mode = null;
-                //強制再描画
+                const scroll_per = this.scroll_per;
+                this.scroll_per = "0";//スクロール位置復元
+                this.mode = null;//強制再描画
                 this.$nextTick(function(){
                     self.mode = $event.mode;
+                    this.scroll_per = scroll_per;
                 });
             },
             /**
@@ -361,6 +363,22 @@
                             self.close_project_dialog();
                         }
                     });
+                }
+            },
+            /**
+             * その他
+             */
+            is_next_project_group: function(prev_project, project){
+                const prev_group = this.get_project_group(prev_project);
+                const group = this.get_project_group(project);
+                return prev_group != group;
+            },
+            get_project_group: function(project){
+                if(!project){
+                    return "";
+                }else{
+                    const tree = project.name.split("/");
+                    return (tree.length <= 0) ? "" : tree[0];
                 }
             },
         },
