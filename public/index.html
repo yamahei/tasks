@@ -106,7 +106,7 @@
                 <button class="delete" @click="cancel" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
-                <div ui="assign-candidate-member" v-for="member in list">
+                <div ui="assign-candidate-member" v-for="member in list" v-bind:key="member.id">
                     <label>
                         <input type="checkbox" class="checkbox" v-model="member.assigned"/>
                         {{ member.name }}
@@ -158,7 +158,7 @@
         <button class="button is-small is-pulled-right" @click="assign_member">
             <span class="icon is-small"><i class="fa fa-users"></i></span>
         </button>
-        <div ui="assigned-member" v-for="member in assigned_members">
+        <div ui="assigned-member" v-for="member in assigned_members" v-bind:key="member.id">
             {{ member.name }}
         </div>
     </div>
@@ -166,7 +166,7 @@
 
 <script type="text/x-template" id="MEMBER_TABLE_TEMPLATE">
     <div ui="member_project_container" ref="content">
-        <div ui="assign-block" :style="get_project_style(project)" v-for="project in assigned_projects">
+        <div ui="assign-block" :style="get_project_style(project)" v-for="project in assigned_projects" v-bind:key="project.id">
             <button class="button is-small is-pulled-right" @click="assign_member(project)">
                 <span class="icon is-small"><i class="fa fa-users"></i></span>
             </button>
@@ -288,7 +288,8 @@
                 </table-body>
             </div>
             <!-- Data: Project -->
-            <div ui="table-row" class="columns has-bottom" v-if="mode_is_project" v-for="project in sorted_projects">
+            <div ui="table-row" class="columns has-bottom"
+                v-if="mode_is_project" v-for="project in sorted_projects" v-bind:key="project.id">
                 <table-title>
                     <p class="is-size-4">{{ project.name }}</p>
                     <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
@@ -305,7 +306,8 @@
                 </table-body>
             </div>
             <!-- Data: Member -->
-            <div ui="table-row" class="columns has-bottom" v-if="mode_is_member" v-for="member in members_all">
+            <div ui="table-row" class="columns has-bottom"
+                v-if="mode_is_member" v-for="member in members_all" v-bind:key="member.id">
                 <table-title>
                     <p class="is-size-4">{{ member.name }}</p>
                     <p class="is-size-7 link-like-text" @click="edit_member(member)">description</p>
@@ -356,8 +358,8 @@
         :v-if="dialog.assign_member.visible"
         :visible="dialog.assign_member.visible"
         :project="dialog.assign_member.project"
-        :members_all="dialog.assign_member.members_all"
-        :members="dialog.assign_member.members"
+        :members_all="members_all"
+        :assigns="assigns"
         @regist="on_regist_assign_member"
         @cancel="close_assign_member_dialog"
     ></assign-member-dialog>

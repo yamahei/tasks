@@ -20,8 +20,6 @@
         assign_member: {//アサインメンバー（プロジェクトに紐づく）
             visible: false,
             project: null,
-            members_all: [],
-            members: [],
         },
     };
     const basedate = {
@@ -43,7 +41,6 @@
         dialog: dialog,
         //
         projects: [],
-        members: [],
         members_all: [],
         assigns: [],
     };
@@ -56,20 +53,23 @@
                 return `width: calc(2rem * (${DATE_RANGE_FORE} + ${DATE_RANGE_PREV}));`
             },
             hash_members: function(){
-                if(!this.members){ return null; }
-                //https://qiita.com/sakymark/items/8832d7a9082935a2d58e
-                return this.members.reduce(
-                    (o, c) => ({...o, [c.id]: c}),
-                    {}
-                );
+                if(!this.members_all){ return null; }
+                //reduceだとなんか変なので泥臭くやる
+                const obj = {};
+                this.members_all.forEach(function(member){
+                    obj[member.id] = member;
+                });
+                return obj;
             },
             hash_projects: function(){
                 if(!this.projects){ return null; }
-                //https://qiita.com/sakymark/items/8832d7a9082935a2d58e
-                return this.projects.reduce(
-                    (o, c) => ({...o, [c.id]: c}),
-                    {}
-                );
+                //reduceだとなんか変なので泥臭くやる
+                const obj = {};
+                this.projects.forEach(function(project){
+                    obj[project.id] = project;
+                });
+                return obj;
+
             },
             mode_is_project: function(){ return !!(this.mode == MODE_PROJECT); },
             mode_is_member: function(){ return !!(this.mode == MODE_MEMBER); },
@@ -88,9 +88,7 @@
             },
         },
         beforeMount: function(){
-            //デバッグ用かも
             this.load_all_members();
-            // this.load_all_projects();
         },
         mounted: function(){
             const self = this;
@@ -119,10 +117,38 @@
                 });
             },
             /**
+             * ビジネスロジック化するかも
+             */
+            find_project_by_projectid: function(project_id){
+               return this.projects.find(function(project){
+                   return project.id === project_id;
+               });
+            },
+            find_member_by_memberid: function(member_id){
+                return this.members_all.find(function(member){
+                    return member.id === member_id;
+                });
+            },
+            get_assigned_members: function(project_id){
+                const self = this;
+                const assigns = this.assigns.filter(function(assign){
+                    return assign.project_id == project_id;
+                })
+                const members = assigns.map(function(assign){
+                    return self.find_member_by_memberid(assign.member_id);
+                });
+                return members;
+            },
+            /**
              * モード変更
              */
             on_change_mode: function($event){
-                this.mode = $event.mode;
+                const self = this;
+                this.mode = null;
+                //強制再描画
+                this.$nextTick(function(){
+                    self.mode = $event.mode;
+                });
             },
             /**
              * 基準日変更⇒読み直し⇒コンポーネントに波及
@@ -150,8 +176,6 @@
                     const data = response.data;
                     self.projects.splice(0);//delete all
                     self.projects.splice(0, 0, ...data.projects);//append all
-                    self.members.splice(0);//delete all
-                    self.members.splice(0, 0, ...data.members);//append all
                     self.assigns.splice(0);//delete all
                     self.assigns.splice(0, 0, ...data.assigns);//append all
                     self.basedate.start = start;
@@ -169,29 +193,14 @@
             /**
              * Assign
              */
-            get_assigned_members: function(project){
-                //TODO: project-table内で重複⇒Biz化必要？
-                const self = this;
-                const assigns = this.assigns.filter(function(assign){
-                    return assign.project_id == project.id;
-                })
-                const members = assigns.map(function(assign){
-                    return self.hash_members[assign.member_id];
-                });
-                return members;
-            },
             assign_member: function(project){
                 this.dialog.assign_member.project = project;
-                this.dialog.assign_member.members_all.splice(0);
-                this.dialog.assign_member.members_all.splice(0, 0, ...this.members_all);
-                this.dialog.assign_member.members.splice(0);
-                this.dialog.assign_member.members.splice(0, 0, ...this.get_assigned_members(project));
                 this.dialog.assign_member.visible = true;
             },
             on_regist_assign_member: function($event){//{ project, [member] }
                 const project_id = $event.project.id;
                 const new_member_ids = $event.assigns.map(function(member){ return member.id; }).sort();
-                const old_member_ids = this.dialog.assign_member.members.map(function(member){ return member.id; }).sort();
+                const old_member_ids = this.get_assigned_members(project_id).map(function(member){ return member.id; }).sort();
                 const append_list = [];
                 const delete_list = [];
                 let new_mid = new_member_ids.shift();
@@ -283,9 +292,9 @@
                 API.update_member(member.id, member.name)
                 .then(function(response){
                     const new_member = response.data;
-                    const old_member = self.hash_members[member.id];
+                    const old_member = self.find_member_by_memberid(member.id);
                     if(old_member){
-                        old_member.name  = new_member.name;
+                        old_member.name = new_member.name;
                         self.close_member_dialog();
                     }
                 });
@@ -296,9 +305,9 @@
                 if(confirm){
                     API.delete_member(member.id)
                     .then(function(response){
-                        const index = self.members.indexOf(member);
+                        const index = self.members_all.indexOf(member);
                         if(index >= 0){
-                            self.members.splice(index, 1);
+                            self.members_all.splice(index, 1);
                             self.close_member_dialog();
                         }
                     });

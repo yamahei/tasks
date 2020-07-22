@@ -4,7 +4,7 @@
 
     const component = {
         template: '#ASSIGN_MEMBER_DIALOG_TEMPLATE',
-        props: ["visible", "project", "members_all", "members"],
+        props: ["visible", "project", "members_all", "assigns"],
         data: function(){
             return {
                 list: [],//{ id, name, checked }
@@ -16,8 +16,8 @@
                     const self = this;
                     this.list.splice(0);
                     const list = this.members_all.map(function(member){
-                        const assigned = !!self.members.find(function(m){
-                            return member.id == m.id;
+                        const assigned = !!self.assigns.find(function(assign){
+                            return member.id === assign.member_id && self.project.id === assign.project_id;
                         });
                         return {
                             id: member.id,
