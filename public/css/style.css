@@ -96,7 +96,26 @@
     margin: 0.25rem;
     padding: 0.25rem;
 }
-
+*[ui='markuped'] h1 { font-size:200%; }
+*[ui='markuped'] h2 { font-size:180%; }
+*[ui='markuped'] h3 { font-size:160%; }
+*[ui='markuped'] h4 { font-size:140%; }
+*[ui='markuped'] h5 { font-size:125%; }
+*[ui='markuped'] h6 { font-size:90%; font-weight: bold; }
+*[ui='markuped'] p, *[ui='markuped'] div {
+    margin-bottom: 1rem;
+}
+*[ui='markuped'] ul, *[ui='markuped'] ol {
+    margin-left: 3rem;
+    margin-bottom: 1rem;
+}
+*[ui='markuped'] blockquote {
+    color: gray;
+    border-left: solid 4px silver;
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+}
 
 /*
  * Footer

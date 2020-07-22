@@ -45,7 +45,18 @@
                         </div>
                     </div>
                     <div class="field">
-                        <textarea class="textarea" rows="2" placeholder="Note: markdown is enabled." v-model="local.note"></textarea>
+                        <div class="tabs is-right">
+                            <ul>
+                                <li :class="{'is-active': note.edit}" @click="edit_note"><a>Edit</a></li>
+                                <li :class="{'is-active': !note.edit}" @click="preview_note"><a>Preview</a></li>
+                            </ul>
+                        </div>
+                        <textarea v-if="note.edit" class="textarea" rows="2" placeholder="Note: markdown is enabled." v-model="local.note"></textarea>
+                        <div v-if="!note.edit" v-html="parsed_gfm" ui="markuped"></div>
+                        <div>
+                            <a target="_blank" href="https://github.com/markedjs/marked">Powered by marked</a>
+                            <a target="_blank" href="https://docs.github.com/ja/github/writing-on-github/basic-writing-and-formatting-syntax">[Help]</a>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -393,6 +404,8 @@
         const REDIUS_LARGE = "12px";
     </script>
 
+    <!-- https://github.com/markedjs/marked -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/1.1.1/marked.js" integrity="sha512-WUj/9d0+WiqmZ3fHLdrjLmuwMnattuKZKOcN03r4++v6IDlTO27Ow/+/2zoiqzDWKn3uDa9skO6Vun5wWKJ9sg==" crossorigin="anonymous"></script>
     <!-- http://www.enjoyxstudy.com/javascript/dateformat/ -->
     <script src="js/dateformat.js"></script>
     <script src="js/util.js"></script>

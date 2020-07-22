@@ -11,6 +11,9 @@
                     name: "", note: "", volume: 0,
                     start: "", last: "",
                 },
+                note: {
+                    edit: false,
+                },
             };
         },
         watch: {
@@ -30,6 +33,7 @@
                     this.local.volume = present.volume;
                     this.local.start = present.start;
                     this.local.last = present.last;
+                    this.note.edit = !(!!this.local.note);
                 }
             },
         },
@@ -45,6 +49,9 @@
                 const last = new Date(this.local.last);
                 if(last < start){ return false; }
                 return true;
+            },
+            parsed_gfm: function(){
+                return marked(this.local.note);
             },
         },
         beforeMount: function(){},
@@ -66,6 +73,8 @@
                     this.$emit("append", obj);
                 }
             },
+            edit_note: function(){ this.note.edit = true; },
+            preview_note: function(){ this.note.edit = false; },
         },
     };
 
