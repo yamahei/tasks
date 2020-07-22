@@ -32,6 +32,8 @@
         loader: { visible: false },
         //モード
         mode: MODE_PROJECT,
+        //プロジェクト名のグルーピング（/区切りの先頭）
+        grouping: false,
         //基準日
         basedate: basedate,
         //スクロール同期
@@ -369,9 +371,13 @@
              * その他
              */
             is_next_project_group: function(prev_project, project){
-                const prev_group = this.get_project_group(prev_project);
-                const group = this.get_project_group(project);
-                return prev_group != group;
+                if(this.grouping){
+                    const prev_group = this.get_project_group(prev_project);
+                    const group = this.get_project_group(project);
+                    return prev_group != group;
+                }else{
+                    return false;
+                }
             },
             get_project_group: function(project){
                 if(!project){
