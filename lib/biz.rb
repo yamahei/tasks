@@ -120,18 +120,12 @@ class Biz
         start = _start || 7.days.ago
         last = _last || 31.days.after
         raise ARGUMENTS if _start && _last && (_start > _last)
-        if all then
-            Project.where("? <= last", start).where("start <= ?", last)
-        else
-            Project.select(:id).where("? <= last", start).where("start <= ?", last)
-        end
+        query = all ? Project : Project.select(:id)
+        query.where("? <= last", start).where("start <= ?", last)
     end
     def _select_between_assign_id select=nil, start=nil, last=nil
-        if !select then
-            Assign.where(project_id: _select_between_project_id(false, start, last))
-        else
-            Assign.select(select).where(project_id: _select_between_project_id(false, start, last))
-        end
+        query = select ? Assign.select(select) : Assign
+        query.where(project_id: _select_between_project_id(false, start, last))
     end
     def select_between_projects start=nil, last=nil#=>[Project]
         _select_between_project_id true, start, last
