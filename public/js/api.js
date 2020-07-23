@@ -6,6 +6,7 @@
         hook: {
             start: null,
             end: null,
+            error: null,
         },
     };
 
@@ -14,6 +15,7 @@
         state.hook.start && state.hook.start();
         return request;
     }, function (error) {
+        state.hook.error && state.hook.error(error);
         state.hook.end && state.hook.end();
         return Promise.reject(error);
     });
@@ -22,10 +24,12 @@
             state.hook.end && state.hook.end();
             return response;
         }else{
+            state.hook.error && state.hook.error(response);
             state.hook.end && state.hook.end();
             return Promise.reject(response);//あってんのかな？
         }
     }, function (error) {
+        state.hook.error && state.hook.error(error);
         state.hook.end && state.hook.end();
         return Promise.reject(error);
     });
@@ -37,9 +41,10 @@
     const api = function(){};
 
     //General
-    api.prototype.set_hooks = function(start, end){
+    api.prototype.set_hooks = function(start, end, error){
         state.hook.start = start;
         state.hook.end = end;
+        state.hook.error = error;
     };
 
 

@@ -96,8 +96,19 @@
             const self = this;
             //初期化
             API.set_hooks(
-                function(){ self.show_loader() },
-                function(){ self.hide_loader() }
+                function(){ self.show_loader(); },
+                function(){ self.hide_loader(); },
+                function(error){
+                    const status = error?.response?.status;
+                    const reason = error?.response?.data?.message ||error?.response?.statusText;
+                    const typical = TYPICAL_ERROR_RESPONSES[status] || null;
+                    const messages = ["エラーが発生しました。"];
+                    if(reason){ messages.push(`  理由：${reason}`); }
+                    if(status){ messages.push(`  ステータスコード：${status}`); }
+                    if(typical){ messages.push(`  一般的な原因：${typical}`); }
+                    messages.push("データの整合性が崩れている可能性があります。ブラウザをリロードしてよいですか？");
+                    Util.confirm_reload(messages.join("\n"));
+                },
             );
             const base = Util.date_to_notime(new Date());
             this.basedate.base = Util.date_to_YMD(base);

@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="field">
-                        <div class="tabs is-right">
+                        <div class="tabs is-right" style="margin-bottom: 2px;">
                             <ul>
                                 <li :class="{'is-active': note.edit}" @click="edit_note"><a>Edit</a></li>
                                 <li :class="{'is-active': !note.edit}" @click="preview_note"><a>Preview</a></li>
@@ -402,6 +402,14 @@
         const A_DAY_MSEC = 1000 * 60 * 60 * 24;//1日分のミリ秒
         const REDIUS_ZERO = "0px";
         const REDIUS_LARGE = "12px";
+        const TYPICAL_ERROR_RESPONSES = {
+            400: "Bad Request: リクエスト方式NG",
+            401: "Unauthorized: 認証エラー",
+            403: "Forbidden: 権限エラー",
+            404: "Not Found: リクエスト先なし",
+            500: "Internal Server Error: サーバPGエラー",
+            503: "Service Unavailable: サーバ負荷過多",
+        };
     </script>
 
     <!-- https://github.com/markedjs/marked -->

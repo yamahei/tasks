@@ -58,6 +58,9 @@
         const input = prompt(message);
         return (input === key);
     }
+    util.prototype.confirm_reload = function(message){
+        if(confirm(message)){ g.location.reload(); }
+    }
 
 
     g.Util = new util();
