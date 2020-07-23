@@ -159,7 +159,7 @@
             <td v-for="month in months" :colspan="month.days" :title="month.label">{{ month.label }}</td>
         </tr>
         <tr ui="calendar-day-row">
-            <td v-for="day in days" :title="day.label" :style="getDayStyle(day)">{{ day.number }}</td>
+            <td v-for="day in days" :title="day.label" :class="{'today': day.today}" :style="getDayStyle(day)">{{ day.number }}</td>
         </tr>
     </table>
 </script>

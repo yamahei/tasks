@@ -30,6 +30,10 @@
                 })
                 const projects = assigns.map(function(assign){
                     return self.hash_projects[assign.project_id];
+                }).sort(function(a, b){
+                    const start = (+new Date(a.start)) - (+new Date(b.start));
+                    const last = (+new Date(a.last)) - (+new Date(b.last));
+                    return start || last || 0;
                 });
                 return projects;
             },

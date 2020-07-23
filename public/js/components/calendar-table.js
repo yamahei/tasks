@@ -20,7 +20,7 @@
                     base = new Date(present);
                     this.start = Util.date_calc(base, -DATE_RANGE_PREV);
                     this.last = Util.date_calc(base, DATE_RANGE_FORE);
-                    this.set_range(this.start, this.last);
+                    this.set_range(base, this.start, this.last);
                     const self = this;
                     const param = {
                         base: base,
@@ -56,8 +56,9 @@
         beforeMount: function(){},
         mounted: function(){},
         methods: {
-            set_range: function(start, last){
+            set_range: function(base, start, last){
                 const self = this;
+                const _base = Util.date_to_notime(base);
                 this.months.splice(0);//delete all
                 this.days.splice(0);//delete all
                 let last_month = null;
@@ -69,6 +70,7 @@
                         raw: now_date, month: now_month,
                         number: now_date.getDate(), 
                         label: Util.date_to_MD(now_date),
+                        today: !!(+_base == +now_date),
                     };
                     this.days.push(day);
                     if(last_month != now_month){
