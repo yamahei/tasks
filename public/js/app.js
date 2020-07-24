@@ -43,7 +43,7 @@
         dialog: dialog,
         //
         projects: [],
-        members_all: [],
+        members: [],
         assigns: [],
     };
     const save_func = function(){
@@ -61,10 +61,10 @@
                 return `width: calc(${A_DAY_WIDTH} * (${DATE_RANGE_FORE} + ${DATE_RANGE_PREV}));`
             },
             hash_members: function(){
-                if(!this.members_all){ return null; }
+                if(!this.members){ return null; }
                 //reduceだとなんか変なので泥臭くやる
                 const obj = {};
-                this.members_all.forEach(function(member){
+                this.members.forEach(function(member){
                     obj[member.id] = member;
                 });
                 return obj;
@@ -132,8 +132,8 @@
                 API.load_all_members()
                 .then(function(response){
                     const members = response.data;
-                    self.members_all.splice(0);//delete all
-                    self.members_all.splice(0, 0, ...members);//append all
+                    self.members.splice(0);//delete all
+                    self.members.splice(0, 0, ...members);//append all
                 });
             },
             /**
@@ -145,7 +145,7 @@
                });
             },
             find_member_by_memberid: function(member_id){
-                return this.members_all.find(function(member){
+                return this.members.find(function(member){
                     return member.id === member_id;
                 });
             },
@@ -307,7 +307,7 @@
                 const self = this;
                 API.append_member(member.name)
                 .then(function(response){
-                    self.members_all.push(response.data);
+                    self.members.push(response.data);
                     self.close_member_dialog();
                 });
             },
@@ -329,9 +329,9 @@
                 if(confirm){
                     API.delete_member(member.id)
                     .then(function(response){
-                        const index = self.members_all.indexOf(member);
+                        const index = self.members.indexOf(member);
                         if(index >= 0){
-                            self.members_all.splice(index, 1);
+                            self.members.splice(index, 1);
                             self.close_member_dialog();
                         }
                     });

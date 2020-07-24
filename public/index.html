@@ -139,15 +139,15 @@
 <script type="text/x-template" id="MODE_SWITCH_TEMPLATE">
     <div class="field has-addons">
         <p class="control">
-            <button class="button" :class="{'is-active': mode_is_project}" @click="switch_to_project">
+            <button accesskey="p" class="button" :class="{'is-active': mode_is_project}" @click="switch_to_project">
                 <span class="icon is-small"><i class="fa fa-tasks"></i></span>
-                <span>Project</span>
+                <span>Project(<u>P</u>)</span>
             </button>
         </p>
         <p class="control">
-            <button class="button" :class="{'is-active': mode_is_member}" @click="switch_to_member">
+            <button accesskey="m" class="button" :class="{'is-active': mode_is_member}" @click="switch_to_member">
                 <span class="icon is-small"><i class="fa fa-user"></i></span>
-                <span>Member</span>
+                <span>Member(<u>M</u>)</span>
             </button>
         </p>
     </div>
@@ -240,17 +240,17 @@
                         <div ui="term-select" class="level-item">
                             <div class="field has-addons">
                                 <p class="control">
-                                    <a class="button" @click="on_basedate_to_prev">
+                                    <button accesskey="l" class="button" @click="on_basedate_to_prev">
                                         <span class="icon is-small"><i class="fa fa-angle-double-left"></i></span>
-                                    </a>
+                                    </button>
                                 </p>
                                 <p class="control">
                                     <input class="input" type="date" v-model="basedate.base" />
                                 </p>
                                 <p class="control">
-                                    <a class="button" @click="on_basedate_to_forward">
+                                    <button accesskey="r" class="button" @click="on_basedate_to_forward">
                                         <span class="icon is-small"><i class="fa fa-angle-double-right"></i></span>
-                                    </a>
+                                    </button>
                                 </p>
                             </div>
                         </div>
@@ -262,8 +262,8 @@
                         </div>
                         <div ui="group-switch" class="level-item">
                             <label>
-                                <input type="checkbox" v-model="grouping" @change="on_change_group"/>
-                                Grouping
+                                <input accesskey="g" type="checkbox" v-model="grouping" @change="on_change_group"/>
+                                Grouping(<u>G</u>)
                             </label>
                         </div>
                     </div>
@@ -296,7 +296,7 @@
                 <!-- Calendar -->
                 <div ui="table-row" class="columns">
                     <table-title>
-                        <button class="button" @click="append_item">
+                        <button accesskey="a" class="button" @click="append_item">
                             <span class="icon is-small"><i class="fa fa-plus"></i></span>
                         </button>
                     </table-title>
@@ -342,7 +342,7 @@
             </template>
             <!-- Data: Member -->
             <div ui="table-row" class="columns has-bottom"
-                v-if="mode_is_member" v-for="member in members_all" v-bind:key="member.id">
+                v-if="mode_is_member" v-for="member in members" v-bind:key="member.id">
                 <table-title>
                     <p class="is-size-4">{{ member.name }}</p>
                     <p class="is-size-7 link-like-text" @click="edit_member(member)">description</p>
@@ -393,7 +393,7 @@
         :v-if="dialog.assign_member.visible"
         :visible="dialog.assign_member.visible"
         :project="dialog.assign_member.project"
-        :members_all="members_all"
+        :members="members"
         :assigns="assigns"
         @regist="on_regist_assign_member"
         @cancel="close_assign_member_dialog"
