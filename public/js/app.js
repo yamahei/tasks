@@ -394,10 +394,22 @@
                 if(!project){
                     return "";
                 }else{
-                    const tree = project.name.split("/");
+                    const tree = project.name.split(PROJECT_GROUP_SPLITER);
                     return (tree.length <= 0) ? "" : tree[0];
                 }
             },
+            get_project_name: function(project){
+                if(!project){
+                    return "";
+                }else{
+                    const parts = project.name.split(PROJECT_GROUP_SPLITER);
+                    if(this.grouping && parts.length >= 2){
+                        parts.shift();
+                    }
+                    return parts.join(PROJECT_GROUP_SPLITER);
+                }
+            },
+
         },
     });
 

@@ -113,7 +113,7 @@
         <div class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title">Assign Member</p>
+                <p class="modal-card-title">Assign: {{ project && project.name }}</p>
                 <button class="delete" @click="cancel" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
@@ -316,7 +316,7 @@
                 </div>
                 <div ui="table-row" class="columns has-bottom" v-bind:key="project.id">
                     <table-title>
-                        <p class="is-size-4">{{ project.name }}</p>
+                        <p class="is-size-4">{{ get_project_name(project) }}</p>
                         <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
                     </table-title>
                     <table-body :canvas_width="canvas_width">
@@ -410,6 +410,7 @@
             500: "Internal Server Error: サーバPGエラー",
             503: "Service Unavailable: サーバ負荷過多",
         };
+        const PROJECT_GROUP_SPLITER = "/";
     </script>
 
     <!-- https://github.com/markedjs/marked -->
