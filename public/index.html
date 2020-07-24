@@ -219,96 +219,103 @@
  -->
 <div id="app">
     
-    <!-- Header -->
-    <section id="header" class="section">
-        <div class="container is-fluid">
-            <nav class="level">
-                <!-- Left side -->
-                <div class="level-left">
-                    <div class="level-item">
-                        <img src="/favicon.ico" style="height: 40px;" />
-                    </div>
-                    <div class="level-item">
-                        どんぶりスケジュール
-                    </div>
-                </div>
-                <!-- Right side -->
-                <div class="level-right">
-                    <div ui="term-select" class="level-item">
-                        <div class="field has-addons">
-                            <p class="control">
-                                <a class="button" @click="on_basedate_to_prev">
-                                    <span class="icon is-small"><i class="fa fa-angle-double-left"></i></span>
-                                </a>
-                            </p>
-                            <p class="control">
-                                <input class="input" type="date" v-model="basedate.base" />
-                            </p>
-                            <p class="control">
-                                <a class="button" @click="on_basedate_to_forward">
-                                    <span class="icon is-small"><i class="fa fa-angle-double-right"></i></span>
-                                </a>
-                            </p>
+    <div ui="fixed">
+
+        <!-- Header -->
+        <section id="header" class="section">
+            <div class="container is-fluid">
+                <nav class="level">
+                    <!-- Left side -->
+                    <div class="level-left">
+                        <div class="level-item">
+                            <!-- https://aniani.me/kimetsu/ -->
+                            <img src="/favicon.ico" style="height: 40px;" />
+                        </div>
+                        <div class="level-item">
+                            どんぶりスケジュール
                         </div>
                     </div>
-                    <div ui="view-switch" class="level-item">
-                        <mode-switch
-                            :mode="mode"
-                            @change="on_change_mode"
-                        ></mode-switch>
+                    <!-- Right side -->
+                    <div class="level-right">
+                        <div ui="term-select" class="level-item">
+                            <div class="field has-addons">
+                                <p class="control">
+                                    <a class="button" @click="on_basedate_to_prev">
+                                        <span class="icon is-small"><i class="fa fa-angle-double-left"></i></span>
+                                    </a>
+                                </p>
+                                <p class="control">
+                                    <input class="input" type="date" v-model="basedate.base" />
+                                </p>
+                                <p class="control">
+                                    <a class="button" @click="on_basedate_to_forward">
+                                        <span class="icon is-small"><i class="fa fa-angle-double-right"></i></span>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                        <div ui="view-switch" class="level-item">
+                            <mode-switch
+                                :mode="mode"
+                                @change="on_change_mode"
+                            ></mode-switch>
+                        </div>
+                        <div ui="group-switch" class="level-item">
+                            <label>
+                                <input type="checkbox" v-model="grouping" @change="on_change_group"/>
+                                Grouping
+                            </label>
+                        </div>
                     </div>
-                    <div ui="group-switch" class="level-item">
-                        <label>
-                            <input type="checkbox" v-model="grouping" @change="on_change_group"/>
-                            Grouping
-                        </label>
-                    </div>
-                </div>
-            </nav>
-        </div>
-    </section>
+                </nav>
+            </div>
+        </section>
 
-    <!-- Handle -->
-    <section id="handle" class="section">
-        <div class="container is-fluid">
-            <div class="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <h1 ui="view-label" class="subtitle" v-if="mode_is_project">Project View</h1>
-                        <h1 ui="view-label" class="subtitle" v-if="mode_is_member">Member View</h1>
+        <!-- Handle -->
+        <section id="handle" class="section">
+            <div class="container is-fluid">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <h1 ui="view-label" class="subtitle" v-if="mode_is_project">Project View</h1>
+                            <h1 ui="view-label" class="subtitle" v-if="mode_is_member">Member View</h1>
+                        </div>
                     </div>
-                </div>
-                <div class="level-right">
-                    <div class="level-item">
-                        <input ui="scroll-handle" type="range" v-model="scroll_per" />
+                    <div class="level-right">
+                        <div class="level-item">
+                            <input ui="scroll-handle" type="range" v-model="scroll_per" />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <!-- Calendar -->
+        <section id="calendar" class="section">
+            <div class="container is-fluid">
+                <!-- Calendar -->
+                <div ui="table-row" class="columns">
+                    <table-title>
+                        <button class="button" @click="append_item">
+                            <span class="icon is-small"><i class="fa fa-plus"></i></span>
+                        </button>
+                    </table-title>
+                    <table-body :canvas_width="canvas_width">
+                        <calendar-table
+                            :base="basedate.base"
+                            :scroll_per="scroll_per"
+                            @change="on_change_basedate"
+                            @scroll="on_calendar_scroll"
+                        ></calendar-table>
+                    </table-body>
+                </div>
+            </div>
+        </section>
+
+    </div>
 
     <!-- Table -->
-    <section id="calendar" class="section">
-        <div class="container is-fluid">
-            <!-- Calendar -->
-            <div ui="table-row" class="columns">
-                <table-title>
-                    <button class="button" @click="append_item">
-                        <span class="icon is-small"><i class="fa fa-plus"></i></span>
-                    </button>
-                </table-title>
-                <table-body :canvas_width="canvas_width">
-                    <calendar-table
-                        :base="basedate.base"
-                        :scroll_per="scroll_per"
-                        @change="on_change_basedate"
-                        @scroll="on_calendar_scroll"
-                    ></calendar-table>
-                </table-body>
-            </div>
-        </div>
-    </section>
-    <section id="table" class="section">
+    <section id="table" class="section top-margin">
         <div class="container is-fluid">
         
             <!-- Data: Project -->
