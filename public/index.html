@@ -257,7 +257,7 @@
                     </div>
                     <div ui="group-switch" class="level-item">
                         <label>
-                            <input type="checkbox" v-model="grouping"/>
+                            <input type="checkbox" v-model="grouping" @change="on_change_group"/>
                             Grouping
                         </label>
                     </div>
@@ -411,6 +411,8 @@
             503: "Service Unavailable: サーバ負荷過多",
         };
         const PROJECT_GROUP_SPLITER = "/";
+        const STORAGE_KEY = "TASKS_STORAGE_KEY";
+        const HOLDING_ITEMS = ["mode", "scroll_per", "grouping"];
     </script>
 
     <!-- https://github.com/markedjs/marked -->

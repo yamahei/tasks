@@ -57,10 +57,27 @@
         ].join("\n");
         const input = prompt(message);
         return (input === key);
-    }
+    };
     util.prototype.confirm_reload = function(message){
         if(confirm(message)){ g.location.reload(); }
-    }
+    };
+    //項目を指定してlocalstorageに保存する
+    util.prototype.save_items = function(items, object){
+        const data = {};
+        items.forEach(function(item){
+            data[item] = object[item];
+        });
+        g.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    };
+    util.prototype.load_items = function(items, object){
+        const data = JSON.parse(g.localStorage.getItem(STORAGE_KEY));
+        if(!data){ return; }
+        items.forEach(function(item){
+            if(data[item] !== undefined){
+                object[item] = data[item];
+            }
+        });
+    };
 
 
     g.Util = new util();

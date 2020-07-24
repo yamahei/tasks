@@ -46,6 +46,12 @@
         members_all: [],
         assigns: [],
     };
+    const save_func = function(){
+        Util.save_items(HOLDING_ITEMS, state);
+    };
+    const load_func = function(){
+        Util.load_items(HOLDING_ITEMS, state);
+    };
     g.STATE = state;
     const app = new Vue({
         el: '#app',
@@ -90,6 +96,7 @@
             },
         },
         beforeMount: function(){
+            load_func();
             this.load_all_members();
         },
         mounted: function(){
@@ -163,6 +170,7 @@
                 this.$nextTick(function(){
                     self.mode = $event.mode;
                     this.scroll_per = scroll_per;
+                    save_func();
                 });
             },
             /**
@@ -203,6 +211,7 @@
             on_calendar_scroll: function($event){
                 if(this.scroll_per == $event.scroll_per){
                     this.scroll_x = $event.scroll_x;
+                    save_func();
                 }
             },
             /**
@@ -379,8 +388,11 @@
                 }
             },
             /**
-             * その他
+             * グルーピング
              */
+            on_change_group: function($event){
+                save_func();
+            },
             is_next_project_group: function(prev_project, project){
                 if(this.grouping){
                     const prev_group = this.get_project_group(prev_project);
@@ -409,7 +421,9 @@
                     return parts.join(PROJECT_GROUP_SPLITER);
                 }
             },
-
+            /**
+             * その他
+             */
         },
     });
 
