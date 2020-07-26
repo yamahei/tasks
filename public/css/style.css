@@ -104,6 +104,20 @@ section.top-margin {
     background-color: silver;
     border: solid 1px gray;
 }
+*[ui='assigned-member'] {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.25rem;
+    white-space: nowrap;
+}
+*[ui='assigned-project'] {
+    display: inline-block;
+    margin: 0.25rem;
+    padding: 0.25rem;
+    white-space: nowrap;
+}
+
+
 *[ui='member-item']{
     margin: 0.25rem;
     padding: 0.25rem;
@@ -129,11 +143,6 @@ section.top-margin {
 *[ui='assign-candidate-member']:hover {
     background-color: gainsboro;
 }
-*[ui='assigned-member'] {
-    display: inline-block;
-    margin: 0.25rem;
-    padding: 0.25rem;
-}
 
 /* Project Dialog */
 
@@ -157,3 +166,4 @@ section.top-margin {
     margin-bottom: 1rem;
     padding-left: 1rem;
 }
+
