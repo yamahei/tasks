@@ -51,6 +51,7 @@ class Biz
         raise ARGUMENTS if !volume
         raise ARGUMENTS if !start
         raise ARGUMENTS if !last
+        raise ARGUMENTS if last < start
         Project.create(name: name, note: note, volume: volume, start: start, last: last)
     end
     def update_project id, name, note, volume, start, last #=>nil
@@ -59,6 +60,7 @@ class Biz
         raise ARGUMENTS if !volume
         raise ARGUMENTS if !start
         raise ARGUMENTS if !last
+        raise ARGUMENTS if last < start
         db_project = select_project_by_id(id)
         raise NOT_FOUND if !db_project
         db_project.update(name: name, note: note, volume: volume, start: start, last: last)
@@ -104,6 +106,12 @@ class Biz
         nil
     end
     def edit_assign delete_list, create_list
+        raise ARGUMENTS if !delete_list
+        raise ARGUMENTS if !delete_list.instance_of?(Array)
+        raise ARGUMENTS if !delete_list.all?{|e| e[:id] ? true : false }
+        raise ARGUMENTS if !create_list
+        raise ARGUMENTS if !create_list.instance_of?(Array)
+        raise ARGUMENTS if !create_list.all?{|e| e[:project_id] && e[:member_id] ? true : false }
         Db.transaction do
             delete_list.each{|item|
                 delete_assign(item[:id])

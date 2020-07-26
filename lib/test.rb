@@ -1,3 +1,7 @@
+#
+# RSpecに移行済み、もうメンテしない（でも一応残す
+#
+
 cd lib
 bundle exec irb
 
