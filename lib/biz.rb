@@ -2,7 +2,7 @@ require "bundler/setup"
 Bundler.require
 # not bundle
 # my class
-require File.expand_path("../db.rb", __FILE__)
+require File.expand_path("../../db/db.rb", __FILE__)
 
 class Biz
     ARGUMENTS="ARGUMENTS".freeze
@@ -28,7 +28,7 @@ class Biz
         raise ARGUMENTS if !id
         db_member = select_member_by_id(id)
         raise NOT_FOUND if !db_member
-        Assign.where(member_id: id).delete_all
+        Assign.where(members_id: id).delete_all
         db_member.destroy
         nil
     end
@@ -40,7 +40,7 @@ class Biz
     end
     def select_assigned_members project #=>[Member]
         raise ARGUMENTS if !project
-        Member.where(id: Assign.select(:member_id).where(project_id: project.id))
+        Member.where(id: Assign.select(:members_id).where(projects_id: project.id))
     end
 
     #
@@ -70,7 +70,7 @@ class Biz
         raise ARGUMENTS if !id
         db_project = select_project_by_id(id)
         raise NOT_FOUND if !db_project
-        Assign.where(project_id: id).delete_all
+        Assign.where(projects_id: id).delete_all
         db_project.destroy
         nil
     end
@@ -82,17 +82,17 @@ class Biz
     end
     def select_assigned_projects member #=>[Project]
         raise ARGUMENTS if !member
-        Project.where(id: Assign.select(:project_id).where(member_id: member.id))
+        Project.where(id: Assign.select(:projects_id).where(members_id: member.id))
     end
 
     #
     # Assign
     #
-    def create_assign project_id, member_id
-        raise ARGUMENTS if !project_id
-        raise ARGUMENTS if !member_id
+    def create_assign projects_id, members_id
+        raise ARGUMENTS if !projects_id
+        raise ARGUMENTS if !members_id
         begin
-            Assign.create(project_id: project_id, member_id: member_id)
+            Assign.create(projects_id: projects_id, members_id: members_id)
         rescue ActiveRecord::RecordNotUnique
             raise "プロジェクト重複"
         end
@@ -111,13 +111,13 @@ class Biz
         raise ARGUMENTS if !delete_list.all?{|e| e[:id] ? true : false }
         raise ARGUMENTS if !create_list
         raise ARGUMENTS if !create_list.instance_of?(Array)
-        raise ARGUMENTS if !create_list.all?{|e| e[:project_id] && e[:member_id] ? true : false }
+        raise ARGUMENTS if !create_list.all?{|e| e[:projects_id] && e[:members_id] ? true : false }
         Db.transaction do
             delete_list.each{|item|
                 delete_assign(item[:id])
             }
             create_list.map{|item| #returns created assigns
-                create_assign(item[:project_id], item[:member_id])
+                create_assign(item[:projects_id], item[:members_id])
             }
         end
     end
@@ -135,7 +135,7 @@ class Biz
     end
     def _select_between_assign_id select=nil, start=nil, last=nil
         query = select ? Assign.select(select) : Assign
-        query.where(project_id: _select_between_project_id(false, start, last))
+        query.where(projects_id: _select_between_project_id(false, start, last))
     end
     def select_between_projects start=nil, last=nil#=>[Project]
         _select_between_project_id true, start, last
@@ -144,7 +144,7 @@ class Biz
         _select_between_assign_id nil, start, last
     end
     def select_between_members start=nil, last=nil#=>[Member]
-        Member.where(id: _select_between_assign_id(:member_id, start, last))
+        Member.where(id: _select_between_assign_id(:members_id, start, last))
     end
 
 

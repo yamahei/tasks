@@ -17,7 +17,7 @@
                     this.list.splice(0);
                     const list = this.members.map(function(member){
                         const assigned = !!self.assigns.find(function(assign){
-                            return member.id === assign.member_id && self.project.id === assign.project_id;
+                            return member.id === assign.members_id && self.project.id === assign.projects_id;
                         });
                         return {
                             id: member.id,

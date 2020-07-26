@@ -45,7 +45,7 @@ assigns = biz.select_between_assigns Date.new(2020, 6, 11), Date.new(2020, 6, 16
 biz.delete_assign(assigns[0].id)
 biz.select_assigned_members project_a#=>[]
 
-biz.edit_assign([], [{project_id: project_a.id, member_id: member.id}])
+biz.edit_assign([], [{projects_id: project_a.id, members_id: member.id}])
 biz.select_assigned_members project_a#=>[member]
 biz.delete_member member
 biz.select_assigned_members project_a#=>[]

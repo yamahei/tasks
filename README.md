@@ -12,12 +12,12 @@ $ bundle install
 DB作成
 ```bash
 $ psql -c "CREATE DATABASE tasks"
-$ psql tasks < "ddl/ddl_v00.sql"
+$ bundle exec rake db:migrate
 ```
 
-テスト※まだ書いてない→[lib/test.rb]を参照
+テスト※TODO: Rakeタスクになってない
 ```bash
-$ #bundle exec rspec spec/lib/biz_spec.rb
+$ bundle exec rspec spec/lib/biz_spec.rb
 ```
 
 起動

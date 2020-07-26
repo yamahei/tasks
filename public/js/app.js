@@ -139,23 +139,23 @@
             /**
              * ビジネスロジック化するかも
              */
-            find_project_by_projectid: function(project_id){
+            find_project_by_projectid: function(projects_id){
                return this.projects.find(function(project){
-                   return project.id === project_id;
+                   return project.id === projects_id;
                });
             },
-            find_member_by_memberid: function(member_id){
+            find_member_by_memberid: function(members_id){
                 return this.members.find(function(member){
-                    return member.id === member_id;
+                    return member.id === members_id;
                 });
             },
-            get_assigned_members: function(project_id){
+            get_assigned_members: function(projects_id){
                 const self = this;
                 const assigns = this.assigns.filter(function(assign){
-                    return assign.project_id == project_id;
+                    return assign.projects_id == projects_id;
                 })
                 const members = assigns.map(function(assign){
-                    return self.find_member_by_memberid(assign.member_id);
+                    return self.find_member_by_memberid(assign.members_id);
                 });
                 return members;
             },
@@ -222,9 +222,9 @@
                 this.dialog.assign_member.visible = true;
             },
             on_regist_assign_member: function($event){//{ project, [member] }
-                const project_id = $event.project.id;
+                const projects_id = $event.project.id;
                 const new_member_ids = $event.assigns.map(function(member){ return member.id; }).sort();
-                const old_member_ids = this.get_assigned_members(project_id).map(function(member){ return member.id; }).sort();
+                const old_member_ids = this.get_assigned_members(projects_id).map(function(member){ return member.id; }).sort();
                 const append_list = [];
                 const delete_list = [];
                 let new_mid = new_member_ids.shift();
@@ -236,16 +236,16 @@
                         new_mid = new_member_ids.shift();
                         old_mid = old_member_ids.shift();
                     }else if(new_mid === undefined && old_mid !== undefined){//oのみ存在⇒o削除
-                        delete_list.push({project_id: project_id, member_id: old_mid});
+                        delete_list.push({projects_id: projects_id, members_id: old_mid});
                         old_mid = old_member_ids.shift();
                     }else if(new_mid !== undefined && old_mid === undefined){//nのみ存在⇒n追加
-                        append_list.push({project_id: project_id, member_id: new_mid});
+                        append_list.push({projects_id: projects_id, members_id: new_mid});
                         new_mid = new_member_ids.shift();
                     }else if(new_mid > old_mid){//oにあってnにない⇒o削除
-                        delete_list.push({project_id: project_id, member_id: old_mid});
+                        delete_list.push({projects_id: projects_id, members_id: old_mid});
                         old_mid = old_member_ids.shift();
                     }else if(new_mid < old_mid){//nにあってoにない⇒n追加
-                        append_list.push({project_id: project_id, member_id: new_mid});
+                        append_list.push({projects_id: projects_id, members_id: new_mid});
                         new_mid = new_member_ids.shift();
                     }
                 };
@@ -259,7 +259,7 @@
                 const self = this;
                 const deletes = delete_list.map(function(item){
                     return self.assigns.find(function(assign){
-                        return assign.project_id == item.project_id && assign.member_id == item.member_id;
+                        return assign.projects_id == item.projects_id && assign.members_id == item.members_id;
                     });
                 });
                 API.edit_assign(deletes, append_list)

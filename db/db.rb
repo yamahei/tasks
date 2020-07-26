@@ -1,9 +1,6 @@
 require "bundler/setup"
 Bundler.require
-# require 'pg'
-# require 'active_record'
-# not bundle
-# my class
+
 
 class Db  < ActiveRecord::Base
     self.abstract_class = true

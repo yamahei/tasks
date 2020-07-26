@@ -102,9 +102,9 @@
     };
 
     //Assign
-    api.prototype.append_assign = function(project_id, member_id){
+    api.prototype.append_assign = function(projects_id, members_id){
         const url = ASSIGN_BASE_URI;
-        const params = { project_id: project_id, member_id: member_id };
+        const params = { projects_id: projects_id, members_id: members_id };
         return axios.put(url, params);
     };
     api.prototype.delete_assign = function(id){

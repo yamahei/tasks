@@ -26,10 +26,10 @@
                 const self = this;
                 const project = this.project;
                 const assigns = this.assigns.filter(function(assign){
-                    return assign.project_id == project.id;
+                    return assign.projects_id == project.id;
                 })
                 const members = assigns.map(function(assign){
-                    return self.hash_members[assign.member_id];
+                    return self.hash_members[assign.members_id];
                 });
                 return members;
             },

@@ -116,7 +116,7 @@ describe "Biz" do
 
       #Edit(create and Delete)
       delete_list = [assign]
-      create_list = [{ project_id: @p2.id, member_id: @m2.id }]
+      create_list = [{ projects_id: @p2.id, members_id: @m2.id }]
       expect{ @biz.edit_assign nil, [] }.to raise_error(Biz::ARGUMENTS)
       expect{ @biz.edit_assign nil, [{}] }.to raise_error(Biz::ARGUMENTS)
       expect{ @biz.edit_assign [], nil }.to raise_error(Biz::ARGUMENTS)
@@ -125,8 +125,8 @@ describe "Biz" do
       expect(created_list).to be_a Array
       expect(created_list[0]).to be_a Assign
       e_assign = created_list[0]
-      expect(e_assign.project_id).to eq @p2.id
-      expect(e_assign.member_id).to eq @m2.id
+      expect(e_assign.projects_id).to eq @p2.id
+      expect(e_assign.members_id).to eq @m2.id
 
       #Delete
       expect{ @biz.delete_assign(nil) }.to raise_error(Biz::ARGUMENTS)

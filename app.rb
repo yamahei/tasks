@@ -137,10 +137,10 @@ class MyApp < Sinatra::Base
     # assign
     put '/api/assigns' do
         validates{ params{
-            required(:project_id).filled(:integer)
-            required(:member_id).filled(:integer)
+            required(:projects_id).filled(:integer)
+            required(:members_id).filled(:integer)
         }}
-        biz.create_assign(params[:project_id], params[:member_id]).to_json
+        biz.create_assign(params[:projects_id], params[:members_id]).to_json
     end
     delete '/api/assigns' do
         validates{ params{
@@ -152,8 +152,8 @@ class MyApp < Sinatra::Base
     post '/api/assigns/edit' do#=>[Assign] *created
         assign_type = Dry::Schema.Params do
             optional(:id).maybe(:integer)
-            required(:project_id).filled(:integer)
-            required(:member_id).filled(:integer)
+            required(:projects_id).filled(:integer)
+            required(:members_id).filled(:integer)
         end
         validates{ params{
             required(:delete_list).value(:array).each(assign_type)
