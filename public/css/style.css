@@ -58,9 +58,11 @@ section.top-margin {
     background-color: white;
 }
 *[ui='calendar-table'] *[ui='calendar-day-row'] td {
-    width: 24px !important;
+    /* width: 24px !important; */
     text-align: center;
-    font-size: 12px;
+    /* font-size: 12px; */
+    overflow: hidden;
+    vertical-align: middle;
 }
 *[ui='calendar-table'] *[ui='calendar-day-row'] td.today {
     font-weight: bold;

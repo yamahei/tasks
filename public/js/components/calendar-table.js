@@ -93,11 +93,20 @@
             },
             getDayStyle: function(day){
                 const yobi = day.raw.getDay();
-                switch(yobi){
-                    case 0: return "background-color: hotpink;";//sun
-                    case 6: return "background-color: skyblue;";//sat
-                    default: return "background-color: white;";//other
-                };
+                const date = day.raw.getDate();
+                const color = (()=>{
+                    switch(yobi){
+                        case 0: return "hotpink";//sun
+                        case 6: return "skyblue";//sat
+                        default: return "white";//other
+                    };
+                })();
+                const size = (date < 10) ? `calc(${A_DAY_WIDTH} * 0.7)` : `calc(${A_DAY_WIDTH} * 0.5)`;
+                return [
+                    `width: ${A_DAY_WIDTH} !important`,
+                    `background-color: ${color}`,
+                    `font-size: ${size}`,
+                ].join(";");
             },
         },
     };

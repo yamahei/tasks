@@ -58,7 +58,7 @@
         data: state,
         computed: {
             canvas_width: function(){
-                return `width: calc(${A_DAY_WIDTH} * (${DATE_RANGE_FORE} + ${DATE_RANGE_PREV}));`
+                return `width: calc(${A_DAY_WIDTH} * (${DATE_RANGE_FORE} + ${DATE_RANGE_PREV} - 1));`
             },
             hash_members: function(){
                 if(!this.members){ return null; }
