@@ -136,6 +136,76 @@
     </div>
 </script>
 
+<script type="text/x-template" id="SETTING_DIALOG_TEMPLATE">
+    <div class="modal" :class="{ 'is-active': show_dialog }">
+        <div class="modal-background"></div>
+        <div class="modal-card" style="width: calc(100vw - 160px); max-width: 800px;">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Setting</p>
+                <button class="delete" @click="cancel" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal">
+                        <label class="label">表示日数</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="field">
+                            <div class="field has-addons">
+                                <p class="control has-icons-left">
+                                    <input class="input" type="number" placeholder="過去" min="1" max="45" v-model="date_range_from">
+                                    <span class="icon is-small is-left"><i class="fa fa-arrow-left"></i></span>
+                                </p>
+                                <p class="control"><a class="button is-static">基準日</a></p>
+                                <p class="control has-icons-right">
+                                    <input class="input" type="number" placeholder="未来" min="1" max="90" v-model="date_range_to">
+                                    <span class="icon is-small is-right"><i class="fa fa-arrow-right"></i></span>
+                                </p>
+                            </div>
+                            <p class="help has-text-grey">基準日の何日前後を表示するか</p>
+                        </div>
+                        <div class="field">
+                            <div class="field has-addons">
+                                <p class="control"><a class="button is-static">1日の幅</a></p>
+                                <p class="control">
+                                    <input class="input" type="text" placeholder="CSS" v-model="a_day_width">
+                                </p>
+                            </div>
+                            <p class="help has-text-grey">e.g. 24px, 4em, ..or more</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="field is-horizontal">
+                    <div class="field-label"><!-- is-normal不要-->
+                        <label class="label">グループ化</label>
+                    </div>
+                    <div class="field-body">
+                        <div class="field">
+                            <p class="control">
+                                <label class="checkbox">
+                                    <input class="checkbox" type="checkbox" v-model="grouping"/>する
+                                </label>
+                            </p>
+                            <p class="help has-text-grey">プロジェクト名（"/"区切り）がグループ化されます</p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <footer class="modal-card-foot">
+                <div style="width: 100%">
+                    <div class="is-pulled-right">
+                        <button class="button" @click="cancel">Cancel</button>
+                        <button class="button is-primary" @click="ok">OK</button>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+</script>
+
+
 <script type="text/x-template" id="MODE_SWITCH_TEMPLATE">
     <div class="field has-addons">
         <p class="control">
@@ -182,7 +252,7 @@
                 <span class="icon is-small"><i class="fa fa-users"></i></span>
             </button>
             <div ui="assigned-project">
-                {{ project.name }}
+                {{ project && project.name }}
             </div>
         </div>
     </div>
@@ -193,6 +263,7 @@
         <slot></slot>
     </div>
 </script>
+
 <script type="text/x-template" id="TABLE_BODY_CONTAINER">
     <div ui="table-colcontainer" class="column">
         <div ui="table-canvas" :style="canvas_width">
@@ -260,11 +331,10 @@
                                 @change="on_change_mode"
                             ></mode-switch>
                         </div>
-                        <div ui="group-switch" class="level-item">
-                            <label>
-                                <input accesskey="g" type="checkbox" v-model="grouping" @change="on_change_group"/>
-                                Grouping(<u>G</u>)
-                            </label>
+                        <div class="level-item">
+                            <button accesskey="s" class="button" @click="open_setting_dialog">
+                                <span class="icon is-small"><i class="fa fa-cogs"></i></span>
+                            </button>
                         </div>
                     </div>
                 </nav>
@@ -304,6 +374,9 @@
                         <calendar-table
                             :base="basedate.base"
                             :scroll_per="scroll_per"
+                            :date_range_from="date_range_from"
+                            :date_range_to="date_range_to"
+                            :a_day_width="a_day_width"
                             @change="on_change_basedate"
                             @scroll="on_calendar_scroll"
                         ></calendar-table>
@@ -335,6 +408,7 @@
                             :assigns="assigns"
                             :hash_members="hash_members"
                             :scroll_x="scroll_x"
+                            :a_day_width="a_day_width"
                             @assign="assign_member"
                         ></project-table>
                     </table-body>
@@ -354,6 +428,7 @@
                         :assigns="assigns"
                         :hash_projects="hash_projects"
                         :scroll_x="scroll_x"
+                        :a_day_width="a_day_width"
                         @assign="assign_member"
                     ></member-table>
                 </table-body>
@@ -399,15 +474,26 @@
         @cancel="close_assign_member_dialog"
     ></assign-member-dialog>
 
+    <setting-dialog
+        :v-if="dialog.setting.visible"
+        :visible="dialog.setting.visible"
+        :date_range_from="dialog.setting.date_range_from"
+        :date_range_to="dialog.setting.date_range_to"
+        :a_day_width="dialog.setting.a_day_width"
+        :grouping="dialog.setting.grouping"
+        @save="save_setting_dialog"
+        @cancel="close_setting_dialog"
+    ></setting-dialog>
+
     <loader :visible="loader.visible"></loader>
 
     <script>
         //const
-        const DATE_RANGE_PREV = 14;//基準日から何日過去まで読み込むか
-        const DATE_RANGE_FORE = 62;//基準日から何日未来まで読み込むか
+        const DATE_RANGE_PREV = 14;//基準日から何日過去まで読み込むか(Default
+        const DATE_RANGE_FORE = 62;//基準日から何日未来まで読み込むか(Default
         const MODE_PROJECT = "MODE_PROJECT"; 
         const MODE_MEMBER = "MODE_MEMBER"; 
-        const A_DAY_WIDTH = "24px";//1日分のカレンダー幅
+        const A_DAY_WIDTH = "24px";//1日分のカレンダー幅(Default
         const A_DAY_MSEC = 1000 * 60 * 60 * 24;//1日分のミリ秒
         const REDIUS_ZERO = "0px";
         const REDIUS_LARGE = "12px";
@@ -421,7 +507,13 @@
         };
         const PROJECT_GROUP_SPLITER = "/";
         const STORAGE_KEY = "TASKS_STORAGE_KEY";
-        const HOLDING_ITEMS = ["mode", "scroll_per", "grouping"];
+        // const HOLDING_ITEMS = ["mode", "scroll_per", "grouping"];
+        const HOLDING_ITEMS = [
+            //UI状態を保存
+            "mode", //"scroll_per",
+            //設定項目を保存
+            "date_range_from", "date_range_to", "a_day_width", "grouping"
+        ];
     </script>
 
     <!-- https://github.com/markedjs/marked -->
@@ -436,6 +528,7 @@
         Vue.config.devtools = true;
     </script>
     <script src="js/components/loader.js"></script>
+    <script src="js/components/setting-dialog.js"></script>
     <script src="js/components/member-dialog.js"></script>
     <script src="js/components/project-dialog.js"></script>
     <script src="js/components/assign-member-dialog.js"></script>

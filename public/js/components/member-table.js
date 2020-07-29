@@ -4,7 +4,7 @@
 
     const component = {
         template: '#MEMBER_TABLE_TEMPLATE',
-        props: ["member", "basedate", "assigns", "hash_projects", "scroll_x"],
+        props: ["member", "basedate", "assigns", "hash_projects", "scroll_x", "this.a_day_width"],
         data: function(){
             return {};
         },
@@ -62,8 +62,8 @@
                 const radius_right = is_right_over ? REDIUS_ZERO : REDIUS_LARGE;
                 return {
                     "position": "relative",
-                    "left": `calc(${A_DAY_WIDTH} * ${x1})`,
-                    "width": `calc(${A_DAY_WIDTH} * ${w})`,
+                    "left": `calc(${this.a_day_width} * ${x1})`,
+                    "width": `calc(${this.a_day_width} * ${w})`,
                     "border-radius": `${radius_left} ${radius_right} ${radius_right} ${radius_left}`,
                 };
             },

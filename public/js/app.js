@@ -2,7 +2,6 @@
 
 (function(g){
 
-
     const dialog = {
         member: {//メンバー編集
             visible: false,
@@ -21,6 +20,13 @@
             visible: false,
             project: null,
         },
+        setting: {//設定
+            visible: false,
+            date_range_from: null,
+            date_range_to: null,
+            a_day_width: null,
+            grouping: null,
+        },
     };
     const basedate = {
         base: null, //String: set in mounted or user
@@ -28,14 +34,17 @@
         last: null, //Date: set in event by component
     };
     const state = {
-        //ローダー
-        loader: { visible: false },
+        //設定項目
+        date_range_from: DATE_RANGE_PREV,//基準日から何日過去まで読み込むか
+        date_range_to: DATE_RANGE_FORE,//基準日から何日未来まで読み込むか
+        a_day_width: A_DAY_WIDTH,//1日分のカレンダー幅
+        grouping: false,//プロジェクト名のグルーピング（/区切りの先頭）
         //モード
         mode: MODE_PROJECT,
-        //プロジェクト名のグルーピング（/区切りの先頭）
-        grouping: false,
         //基準日
         basedate: basedate,
+        //ローダー
+        loader: { visible: false },
         //スクロール同期
         scroll_per: 0,//set by ui
         scroll_x: 0,//set by component, and refer from component
@@ -58,7 +67,7 @@
         data: state,
         computed: {
             canvas_width: function(){
-                return `width: calc(${A_DAY_WIDTH} * (${DATE_RANGE_FORE} + ${DATE_RANGE_PREV} - 1));`
+                return `width: calc(${this.a_day_width} * (${this.date_range_to} + ${this.date_range_from} + 1));`
             },
             hash_members: function(){
                 if(!this.members){ return null; }
@@ -387,12 +396,36 @@
                     });
                 }
             },
+            //設定ダイアログ
+            open_setting_dialog: function(){
+                this.dialog.setting.date_range_from = this.date_range_from;
+                this.dialog.setting.date_range_to = this.date_range_to;
+                this.dialog.setting.a_day_width = this.a_day_width;
+                this.dialog.setting.grouping = this.grouping;
+                this.dialog.setting.visible = true;
+            },
+            save_setting_dialog: function($event){
+                const change_from  = !!(this.date_range_from != $event.date_range_from);
+                const change_to    = !!(this.date_range_to != $event.date_range_to);
+                const change_width = !!(this.a_day_width !== $event.a_day_width);
+                this.date_range_from = $event.date_range_from;
+                this.date_range_to = $event.date_range_to;
+                this.a_day_width = $event.a_day_width;
+                this.grouping = $event.grouping;
+                save_func();
+                if(change_from || change_to || change_width){
+                    //再描画もうまくいかないし、データ読込発生するので、リロードしちゃう
+                    g.location.reload();
+                }
+                this.close_setting_dialog();
+            },
+            close_setting_dialog: function(){
+                this.dialog.setting.visible = false;
+            },
+
             /**
              * グルーピング
              */
-            on_change_group: function($event){
-                save_func();
-            },
             is_next_project_group: function(prev_project, project){
                 if(this.grouping){
                     const prev_group = this.get_project_group(prev_project);

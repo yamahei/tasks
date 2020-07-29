@@ -4,7 +4,7 @@
 
     const component = {
         template: '#CALENDAR_TABLE_TEMPLATE',
-        props: ["base", "scroll_per"],
+        props: ["base", "scroll_per", "a_day_width", "date_range_from", "date_range_to"],
         data: function(){
             return {
                 start: null,
@@ -18,16 +18,13 @@
             base: function(present, old){
                 if(present){
                     base = new Date(present);
-                    this.start = Util.date_calc(base, -DATE_RANGE_PREV);
-                    this.last = Util.date_calc(base, DATE_RANGE_FORE);
-                    this.set_range(base, this.start, this.last);
-                    const self = this;
+                    this.set_range(base);
                     const param = {
                         base: base,
                         start: this.start,
                         last: this.last,
                     };
-                    this.$emit("change", param);
+                    this.$emit("change", param);//再読み込みさせるイベント
                 }else{
                     this.start = null;
                     this.last = null;
@@ -56,8 +53,10 @@
         beforeMount: function(){},
         mounted: function(){},
         methods: {
-            set_range: function(base, start, last){
+            set_range: function(base){
                 const self = this;
+                const start = this.start = Util.date_calc(base, -this.date_range_from);
+                const last = this.last = Util.date_calc(base, this.date_range_to);
                 const _base = Util.date_to_notime(base);
                 this.months.splice(0);//delete all
                 this.days.splice(0);//delete all
@@ -101,9 +100,9 @@
                         default: return "white";//other
                     };
                 })();
-                const size = (date < 10) ? `calc(${A_DAY_WIDTH} * 0.7)` : `calc(${A_DAY_WIDTH} * 0.5)`;
+                const size = (date < 10) ? `calc(${this.a_day_width} * 0.7)` : `calc(${this.a_day_width} * 0.5)`;
                 return [
-                    `width: ${A_DAY_WIDTH} !important`,
+                    `width: ${this.a_day_width} !important`,
                     `background-color: ${color}`,
                     `font-size: ${size}`,
                 ].join(";");
