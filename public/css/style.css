@@ -94,7 +94,7 @@ section.top-margin {
 *[ui='table-rowtitle']{}
 *[ui='table-colcontainer']{
     padding: 0;
-    overflow: hidden;
+    overflow: auto;
 }
 *[ui='table-canvas']{
     margin: 0;

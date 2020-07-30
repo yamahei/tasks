@@ -173,13 +173,10 @@
              */
             on_change_mode: function($event){
                 const self = this;
-                const scroll_per = this.scroll_per;
-                this.scroll_per = "0";//スクロール位置復元
                 this.mode = null;//強制再描画
                 this.$nextTick(function(){
                     self.mode = $event.mode;
-                    this.scroll_per = scroll_per;
-                    save_func();
+                    self.scroll_x = 0;
                 });
             },
             /**
@@ -217,11 +214,11 @@
             /**
              * カレンダースクロール⇒同期
              */
-            on_calendar_scroll: function($event){
-                if(this.scroll_per == $event.scroll_per){
-                    this.scroll_x = $event.scroll_x;
-                    save_func();
-                }
+            on_table_scroll: function($event){
+                console.log($event);
+                const $el = $event.target;
+                this.scroll_x = $el.scrollLeft;
+                save_func();
             },
             /**
              * Assign

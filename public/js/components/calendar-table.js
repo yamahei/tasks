@@ -4,7 +4,7 @@
 
     const component = {
         template: '#CALENDAR_TABLE_TEMPLATE',
-        props: ["base", "scroll_per", "a_day_width", "date_range_from", "date_range_to"],
+        props: ["base", "scroll_per", "scroll_x", "a_day_width", "date_range_from", "date_range_to"],
         data: function(){
             return {
                 start: null,
@@ -32,20 +32,16 @@
                     this.days = [];
                 }
             },
-            scroll_per: function(present, old){
-                const per = (present || 0) * 1;
+            scroll_x: function(present, old){//TODO: xxx-table.jsみんな同じ
+                const x = (present || 0) * 1;
                 const $me = this.$refs.content;
                 const $parent = $me.parentElement;
                 if(!$parent){ return; }
                 const $grand = $parent.parentElement;
                 if(!$grand){ return; }
-                const canvas_width = $parent.scrollWidth;
-                const frame_width = $grand.clientWidth;
-                const x = (canvas_width - frame_width) * (per / 100);
-                if(x >= 0){
+                const scrollLeft = $grand.scrollLeft;
+                if(x != scrollLeft){
                     $grand.scrollTo(x, 0);
-                    const param = { scroll_per: present, scroll_x: x };
-                    this.$emit("scroll", param);
                 }
             },
         },

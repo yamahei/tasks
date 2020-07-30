@@ -341,44 +341,28 @@
             </div>
         </section>
 
-        <!-- Handle -->
-        <section id="handle" class="section">
-            <div class="container is-fluid">
-                <div class="level">
-                    <div class="level-left">
-                        <div class="level-item">
-                            <h1 ui="view-label" class="subtitle" v-if="mode_is_project">Project View</h1>
-                            <h1 ui="view-label" class="subtitle" v-if="mode_is_member">Member View</h1>
-                        </div>
-                    </div>
-                    <div class="level-right">
-                        <div class="level-item">
-                            <input ui="scroll-handle" type="range" v-model="scroll_per" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Calendar -->
         <section id="calendar" class="section">
             <div class="container is-fluid">
                 <!-- Calendar -->
                 <div ui="table-row" class="columns">
                     <table-title>
-                        <button accesskey="a" class="button" @click="append_item">
-                            <span class="icon is-small"><i class="fa fa-plus"></i></span>
-                        </button>
+                        <h1 ui="view-label" class="subtitle">
+                            <button accesskey="a" class="button" @click="append_item">
+                                <span class="icon is-small"><i class="fa fa-plus"></i></span>
+                            </button>
+                            <span v-if="mode_is_project">Project View</span>
+                            <span v-if="mode_is_member">Member View</span>
+                        </h1>
                     </table-title>
-                    <table-body :canvas_width="canvas_width">
+                    <table-body :canvas_width="canvas_width" v-scroll="on_table_scroll">
                         <calendar-table
                             :base="basedate.base"
-                            :scroll_per="scroll_per"
+                            :scroll_x="scroll_x"
                             :date_range_from="date_range_from"
                             :date_range_to="date_range_to"
                             :a_day_width="a_day_width"
                             @change="on_change_basedate"
-                            @scroll="on_calendar_scroll"
                         ></calendar-table>
                     </table-body>
                 </div>
@@ -401,7 +385,7 @@
                         <p class="is-size-4">{{ get_project_name(project) }}</p>
                         <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
                     </table-title>
-                    <table-body :canvas_width="canvas_width">
+                    <table-body :canvas_width="canvas_width" v-scroll="on_table_scroll">
                         <project-table
                             :project="project"
                             :basedate="basedate"
@@ -421,7 +405,7 @@
                     <p class="is-size-4">{{ member.name }}</p>
                     <p class="is-size-7 link-like-text" @click="edit_member(member)">description</p>
                 </table-title>
-                <table-body :canvas_width="canvas_width">
+                <table-body :canvas_width="canvas_width" v-scroll="on_table_scroll">
                     <member-table
                         :member="member"
                         :basedate="basedate"
@@ -510,7 +494,7 @@
         // const HOLDING_ITEMS = ["mode", "scroll_per", "grouping"];
         const HOLDING_ITEMS = [
             //UI状態を保存
-            "mode", //"scroll_per",
+            "mode", //"scroll_x",
             //設定項目を保存
             "date_range_from", "date_range_to", "a_day_width", "grouping"
         ];
@@ -527,6 +511,7 @@
         //debug
         Vue.config.devtools = true;
     </script>
+    <script src="js/components/v-scroll.js"></script>
     <script src="js/components/loader.js"></script>
     <script src="js/components/setting-dialog.js"></script>
     <script src="js/components/member-dialog.js"></script>

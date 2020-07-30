@@ -9,14 +9,15 @@
             return {};
         },
         watch: {
-            scroll_x: function(present, old){
+            scroll_x: function(present, old){//TODO: xxx-table.jsみんな同じ
                 const x = (present || 0) * 1;
                 const $me = this.$refs.content;
                 const $parent = $me.parentElement;
                 if(!$parent){ return; }
                 const $grand = $parent.parentElement;
                 if(!$grand){ return; }
-                if(x >= 0){
+                const scrollLeft = $grand.scrollLeft;
+                if(x != scrollLeft){
                     $grand.scrollTo(x, 0);
                 }
             },
