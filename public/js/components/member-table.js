@@ -4,7 +4,7 @@
 
     const component = {
         template: '#MEMBER_TABLE_TEMPLATE',
-        props: ["member", "basedate", "assigns", "hash_projects", "scroll_x", "this.a_day_width"],
+        props: ["member", "basedate", "assigns", "hash_projects", "scroll_x", "a_day_width"],
         data: function(){
             return {};
         },
