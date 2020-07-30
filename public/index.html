@@ -355,7 +355,7 @@
                             <span v-if="mode_is_member">Member View</span>
                         </h1>
                     </table-title>
-                    <table-body :canvas_width="canvas_width" v-scroll="on_table_scroll">
+                    <table-body class="gray-scroll" :canvas_width="canvas_width" v-scroll="on_table_scroll">
                         <calendar-table
                             :base="basedate.base"
                             :scroll_x="scroll_x"
@@ -385,7 +385,7 @@
                         <p class="is-size-4">{{ get_project_name(project) }}</p>
                         <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
                     </table-title>
-                    <table-body :canvas_width="canvas_width" v-scroll="on_table_scroll">
+                    <table-body class="white-scroll" :canvas_width="canvas_width" v-scroll="on_table_scroll">
                         <project-table
                             :project="project"
                             :basedate="basedate"
@@ -405,7 +405,7 @@
                     <p class="is-size-4">{{ member.name }}</p>
                     <p class="is-size-7 link-like-text" @click="edit_member(member)">description</p>
                 </table-title>
-                <table-body :canvas_width="canvas_width" v-scroll="on_table_scroll">
+                <table-body class="white-scroll" :canvas_width="canvas_width" v-scroll="on_table_scroll">
                     <member-table
                         :member="member"
                         :basedate="basedate"
