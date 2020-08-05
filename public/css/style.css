@@ -125,9 +125,28 @@ section.top-margin {
 *[ui='assign-block']{
     margin: 0; margin-bottom: 0.25rem;
     padding: 0.5rem 1rem;
-    background-color: silver;
-    border: solid 1px gray;
+    /* background-color: silver; */
+    /* border: solid 1px gray; */
+    background-image: url("line.png");
+    background-position: left top;
+    background-repeat: repeat-x;
 }
+*.arrow-left[ui='assign-block']::before, *.arrow-both[ui='assign-block']::before{
+    display: inline-block;
+    vertical-align: middle;
+    content: url("arrow-l.png");
+    position: absolute;
+    left: -0.25rem;
+    top: 0;
+}
+*.arrow-right[ui='assign-block']::after, *.arrow-both[ui='assign-block']::after{
+    display: inline-block;
+    content: url("arrow-r.png");
+    position: absolute;
+    right: -0.25rem;
+    top: 0;
+}
+
 *[ui='assigned-member'] {
     display: inline-block;
     margin: 0.25rem;
