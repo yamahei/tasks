@@ -125,8 +125,6 @@ section.top-margin {
 *[ui='assign-block']{
     margin: 0; margin-bottom: 0.25rem;
     padding: 0.5rem 1rem;
-    /* background-color: silver; */
-    /* border: solid 1px gray; */
     background-image: url("line.png");
     background-position: left top;
     background-repeat: repeat-x;
@@ -149,14 +147,14 @@ section.top-margin {
 
 *[ui='assigned-member'] {
     display: inline-block;
-    margin: 0.25rem;
-    padding: 0.25rem;
+    margin: 0;
+    padding: 0.125rem 0.25rem;
     white-space: nowrap;
 }
 *[ui='assigned-project'] {
     display: inline-block;
-    margin: 0.25rem;
-    padding: 0.25rem;
+    margin: 0;
+    padding: 0.125rem 0.25rem;
     white-space: nowrap;
 }
 

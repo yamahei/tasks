@@ -235,8 +235,9 @@
 </script>
 
 <script type="text/x-template" id="PROJECT_TABLE_TEMPLATE">
-    <div ui="assign-block" :style="project_style" ref="content">
-        <button class="button is-small is-pulled-right" @click="assign_member">
+    <div ui="assign-block" :style="project_style" :class="project_class" ref="content">
+        <br/>
+        <button class="button is-small" @click="assign_member">
             <span class="icon is-small"><i class="fa fa-users"></i></span>
         </button>
         <div ui="assigned-member" v-for="member in assigned_members" v-bind:key="member.id">
@@ -247,8 +248,9 @@
 
 <script type="text/x-template" id="MEMBER_TABLE_TEMPLATE">
     <div ui="member_project_container" ref="content">
-        <div ui="assign-block" :style="get_project_style(project)" v-for="project in assigned_projects" v-bind:key="project.id">
-            <button class="button is-small is-pulled-right" @click="assign_member(project)">
+        <div ui="assign-block" :style="get_project_style(project)" :class="get_project_class(project)" v-for="project in assigned_projects" v-bind:key="project.id">
+            <br/>
+            <button class="button is-small" @click="assign_member(project)">
                 <span class="icon is-small"><i class="fa fa-users"></i></span>
             </button>
             <div ui="assigned-project">

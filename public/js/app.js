@@ -215,7 +215,6 @@
              * カレンダースクロール⇒同期
              */
             on_table_scroll: function($event){
-                console.log($event);
                 const $el = $event.target;
                 this.scroll_x = $el.scrollLeft;
                 save_func();
