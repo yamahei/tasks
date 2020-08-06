@@ -92,11 +92,16 @@
             mode_is_member: function(){ return !!(this.mode == MODE_MEMBER); },
             sorted_projects: function(){
                 return this.projects.sort(function(a, b){
-                    if(a.name == b.name){
-                        return a.id * 1 - b.id * 1;
-                    }else if(a.name < b.name){
+                    const group_a = a.name.split(PROJECT_GROUP_SPLITER).shift();
+                    const group_b = b.name.split(PROJECT_GROUP_SPLITER).shift();
+                    if(group_a == group_b){
+                        const diff_start =  +new Date(a.start) - +new Date(b.start);
+                        const diff_volume = (a.volume || 0) - (b.volume || 0);
+                        if(diff_start){ return diff_start; }
+                        if(diff_volume){ return diff_volume; }
+                    }else if(group_a < group_b){
                         return -1;
-                    }else if(a.name > b.name){
+                    }else if(group_a > group_b){
                         return 1;
                     }else{
                         return 0;

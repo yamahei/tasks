@@ -80,6 +80,7 @@ section.top-margin {
 
 *[ui='group-header'] {
     font-weight: bolder;
+    background-color: #e3e3fd;
 }
 *[ui='group-header']:not(:last-child) {
     margin-top: 1rem;
