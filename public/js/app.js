@@ -22,6 +22,9 @@
         },
         setting: {//設定
             visible: false,
+            show_load: false,
+            load_threshold_high: null,
+            load_threshold_low: null,
             date_range_from: null,
             date_range_to: null,
             a_day_width: null,
@@ -35,9 +38,12 @@
     };
     const state = {
         //設定項目
-        date_range_from: DATE_RANGE_PREV,//基準日から何日過去まで読み込むか
-        date_range_to: DATE_RANGE_FORE,//基準日から何日未来まで読み込むか
-        a_day_width: A_DAY_WIDTH,//1日分のカレンダー幅
+        show_load: true,//メンバー負荷概算を表示
+        load_threshold_high: 1.25,//メンバー負荷上限
+        load_threshold_low: 0.75,//メンバー負荷下限
+        date_range_from: 14,//基準日から何日過去まで読み込むか
+        date_range_to: 62,//基準日から何日未来まで読み込むか
+        a_day_width: "24px",//1日分のカレンダー幅
         grouping: false,//プロジェクト名のグルーピング（/区切りの先頭）
         //モード
         mode: MODE_PROJECT,
@@ -399,6 +405,9 @@
             },
             //設定ダイアログ
             open_setting_dialog: function(){
+                this.dialog.setting.show_load = this.show_load;
+                this.dialog.setting.load_threshold_high = this.load_threshold_high;
+                this.dialog.setting.load_threshold_low = this.load_threshold_low;
                 this.dialog.setting.date_range_from = this.date_range_from;
                 this.dialog.setting.date_range_to = this.date_range_to;
                 this.dialog.setting.a_day_width = this.a_day_width;
@@ -409,6 +418,9 @@
                 const change_from  = !!(this.date_range_from != $event.date_range_from);
                 const change_to    = !!(this.date_range_to != $event.date_range_to);
                 const change_width = !!(this.a_day_width !== $event.a_day_width);
+                this.show_load = $event.show_load;
+                this.load_threshold_high = $event.load_threshold_high;
+                this.load_threshold_low = $event.load_threshold_low;
                 this.date_range_from = $event.date_range_from;
                 this.date_range_to = $event.date_range_to;
                 this.a_day_width = $event.a_day_width;

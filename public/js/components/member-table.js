@@ -59,8 +59,6 @@
                 const x1 = is_left_over ? 0 : (pj_start - app_start);
                 const x2 = (is_right_over ? app_last : pj_last) - app_start;
                 const w = x2 - x1 + 1;
-                const radius_left = is_left_over ? REDIUS_ZERO : REDIUS_LARGE;
-                const radius_right = is_right_over ? REDIUS_ZERO : REDIUS_LARGE;
                 return {
                     "position": "relative",
                     "left": `calc(${this.a_day_width} * ${x1})`,
