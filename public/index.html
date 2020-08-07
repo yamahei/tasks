@@ -145,34 +145,6 @@
                 <button class="delete" @click="cancel" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
-                
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">メンバー負荷</label>
-                    </div>
-                    <div class="field-body">
-                        <div class="field">
-                            <p class="control">
-                                <label class="checkbox">
-                                    <input class="checkbox" type="checkbox" v-model="show_load"/>表示する
-                                </label>
-                            </p>
-                        </div>    
-                        <div class="field has-addons">
-                            <p class="control"><a class="button is-static">過小</a></p>
-                            <p class="control">
-                                <input class="input" type="number" placeholder="下限" min="0" max="1" step="0.01" v-model="load_threshold_low">
-                            </p>
-                            <p class="control"><a class="button is-static">正常</a></p>
-                            <p class="control has-icons-right">
-                                <input class="input" type="number" placeholder="上限" min="1" max="3" step="0.01" v-model="load_threshold_high">
-                            </p>
-                            <p class="control"><a class="button is-static">過大</a></p>
-                        </div>
-
-                    </div>
-                </div>
-
                 <div class="field is-horizontal">
                     <div class="field-label is-normal">
                         <label class="label">表示日数</label>
@@ -283,14 +255,6 @@
             </div>
         </div>
     </div>
-</script>
-
-<script type="text/x-template" id="LOAD_TABLE_TEMPLATE">
-    <table ui="load-table" ref="content">
-        <tr ui="load-day-row">
-            <td v-for="day in days" :title="day.label" :class="{'today': day.today}" :style="getDayStyle(day)">{{ day.number }}</td>
-        </tr>
-    </table>
 </script>
 
 <script type="text/x-template" id="TABLE_TITLE_CONTAINER">
@@ -411,11 +375,17 @@
         <div class="container is-fluid">
         
             <!-- Data: Project -->
-            <template v-if="mode_is_project" v-for="(project, index) in sorted_projects">
+            <template v-if="mode_is_project && !toggling" v-for="(project, index) in sorted_projects">
                 <div class="columns" v-if="is_next_project_group(sorted_projects[index - 1], project)">
-                    <div class="column" ui="group-header">{{ get_project_group(project) }}</div>
+                    <div class="column" ui="group-header">
+                        <span @click="toggle_group(project)" class="icon is-small">
+                            <i class="fa fa-chevron-right" v-if="is_group_close(project)"></i>
+                            <i class="fa fa-chevron-down" v-if="is_group_open(project)"></i>
+                        </span>
+                        {{ get_project_group(project) }}
+                    </div>
                 </div>
-                <div ui="table-row" class="columns has-bottom" v-bind:key="project.id">
+                <div ui="table-row" class="columns has-bottom" v-bind:key="project.id" v-if="is_group_open(project)">
                     <table-title>
                         <p class="is-size-4">{{ get_project_name(project) }}</p>
                         <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
@@ -434,32 +404,25 @@
                 </div>
             </template>
             <!-- Data: Member -->
-            <div ui="table-row" class="columns has-bottom"
-                v-if="mode_is_member" v-for="member in members" v-bind:key="member.id">
-                <table-title>
-                    <p class="is-size-4">{{ member.name }}</p>
-                    <p class="is-size-7 link-like-text" @click="edit_member(member)">description</p>
-                </table-title>
-                <table-body class="white-scroll" :canvas_width="canvas_width" v-scroll="on_table_scroll">
-                    <load-table
-                        v-if="show_load"
-                        :base="basedate.base"
-                        :scroll_x="scroll_x"
-                        :date_range_from="date_range_from"
-                        :date_range_to="date_range_to"
-                        :a_day_width="a_day_width"
-                    ></load-table>
-                    <member-table
-                        :member="member"
-                        :basedate="basedate"
-                        :assigns="assigns"
-                        :hash_projects="hash_projects"
-                        :scroll_x="scroll_x"
-                        :a_day_width="a_day_width"
-                        @assign="assign_member"
-                    ></member-table>
-                </table-body>
-            </div>
+            <template v-if="mode_is_member" v-for="member in members" v-bind:key="member.id">
+                <div ui="table-row" class="columns has-bottom">
+                    <table-title>
+                        <p class="is-size-4">{{ member.name }}</p>
+                        <p class="is-size-7 link-like-text" @click="edit_member(member)">description</p>
+                    </table-title>
+                    <table-body class="white-scroll" :canvas_width="canvas_width" v-scroll="on_table_scroll">
+                        <member-table
+                            :member="member"
+                            :basedate="basedate"
+                            :assigns="assigns"
+                            :hash_projects="hash_projects"
+                            :scroll_x="scroll_x"
+                            :a_day_width="a_day_width"
+                            @assign="assign_member"
+                        ></member-table>
+                    </table-body>
+                </div>
+            </template>
                 
         </div>
     </section>
@@ -504,9 +467,6 @@
     <setting-dialog
         :v-if="dialog.setting.visible"
         :visible="dialog.setting.visible"
-        :show_load="dialog.setting.show_load"
-        :load_threshold_high="dialog.setting.load_threshold_high"
-        :load_threshold_low="dialog.setting.load_threshold_low"
         :date_range_from="dialog.setting.date_range_from"
         :date_range_to="dialog.setting.date_range_to"
         :a_day_width="dialog.setting.a_day_width"
@@ -532,12 +492,10 @@
         };
         const PROJECT_GROUP_SPLITER = "/";
         const STORAGE_KEY = "TASKS_STORAGE_KEY";
-        // const HOLDING_ITEMS = ["mode", "scroll_per", "grouping"];
         const HOLDING_ITEMS = [
             //UI状態を保存
             "mode", //"scroll_x",
             //設定項目を保存
-            "show_load", "load_threshold_high", "load_threshold_low",
             "date_range_from", "date_range_to", "a_day_width", "grouping"
         ];
     </script>

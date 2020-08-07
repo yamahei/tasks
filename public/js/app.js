@@ -22,9 +22,6 @@
         },
         setting: {//設定
             visible: false,
-            show_load: false,
-            load_threshold_high: null,
-            load_threshold_low: null,
             date_range_from: null,
             date_range_to: null,
             a_day_width: null,
@@ -38,9 +35,6 @@
     };
     const state = {
         //設定項目
-        show_load: true,//メンバー負荷概算を表示
-        load_threshold_high: 1.25,//メンバー負荷上限
-        load_threshold_low: 0.75,//メンバー負荷下限
         date_range_from: 14,//基準日から何日過去まで読み込むか
         date_range_to: 62,//基準日から何日未来まで読み込むか
         a_day_width: "24px",//1日分のカレンダー幅
@@ -52,11 +46,13 @@
         //ローダー
         loader: { visible: false },
         //スクロール同期
-        scroll_per: 0,//set by ui
         scroll_x: 0,//set by component, and refer from component
         //ダイアログ
         dialog: dialog,
-        //
+        //プロジェクトグループ開閉（保存はしない
+        group_toggle_close: {},
+        toggling: false,//強制再描画
+        //基本データ
         projects: [],
         members: [],
         assigns: [],
@@ -188,6 +184,7 @@
                 this.$nextTick(function(){
                     self.mode = $event.mode;
                     self.scroll_x = 0;
+                    save_func();
                 });
             },
             /**
@@ -405,9 +402,6 @@
             },
             //設定ダイアログ
             open_setting_dialog: function(){
-                this.dialog.setting.show_load = this.show_load;
-                this.dialog.setting.load_threshold_high = this.load_threshold_high;
-                this.dialog.setting.load_threshold_low = this.load_threshold_low;
                 this.dialog.setting.date_range_from = this.date_range_from;
                 this.dialog.setting.date_range_to = this.date_range_to;
                 this.dialog.setting.a_day_width = this.a_day_width;
@@ -418,9 +412,6 @@
                 const change_from  = !!(this.date_range_from != $event.date_range_from);
                 const change_to    = !!(this.date_range_to != $event.date_range_to);
                 const change_width = !!(this.a_day_width !== $event.a_day_width);
-                this.show_load = $event.show_load;
-                this.load_threshold_high = $event.load_threshold_high;
-                this.load_threshold_low = $event.load_threshold_low;
                 this.date_range_from = $event.date_range_from;
                 this.date_range_to = $event.date_range_to;
                 this.a_day_width = $event.a_day_width;
@@ -449,17 +440,16 @@
                 }
             },
             get_project_group: function(project){
-                if(!project){
-                    return "";
-                }else{
+                let group = "";
+                if(!project){ return ""; }
+                else{
                     const tree = project.name.split(PROJECT_GROUP_SPLITER);
                     return (tree.length <= 0) ? "" : tree[0];
                 }
             },
             get_project_name: function(project){
-                if(!project){
-                    return "";
-                }else{
+                if(!project){ return ""; }
+                else{
                     const parts = project.name.split(PROJECT_GROUP_SPLITER);
                     if(this.grouping && parts.length >= 2){
                         parts.shift();
@@ -467,6 +457,24 @@
                     return parts.join(PROJECT_GROUP_SPLITER);
                 }
             },
+            toggle_group: function(project){
+                const group = this.get_project_group(project);
+                this.group_toggle_close[group] = !this.group_toggle_close[group];
+                this.toggling = true;
+                const self = this;
+                this.$nextTick(function(){
+                    self.toggling = false;
+                });
+            },
+            is_group_close: function(project){
+                const group = this.get_project_group(project);
+                return this.group_toggle_close[group];
+            },
+            is_group_open: function(project){
+                const group = this.get_project_group(project);
+                return !this.group_toggle_close[group];
+            },
+
             /**
              * その他
              */

@@ -4,7 +4,7 @@
 
     const component = {
         template: '#CALENDAR_TABLE_TEMPLATE',
-        props: ["base", "scroll_per", "scroll_x", "a_day_width", "date_range_from", "date_range_to"],
+        props: ["base", "scroll_x", "a_day_width", "date_range_from", "date_range_to"],
         data: function(){
             return {
                 start: null,
