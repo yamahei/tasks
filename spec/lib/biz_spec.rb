@@ -109,19 +109,37 @@ describe "Biz" do
     it "CRUD" do
 
       #Create
-      assign = @biz.create_assign @p1.id, @m1.id
-      expect{ @biz.create_assign nil, 1 }.to raise_error(Biz::ARGUMENTS)
-      expect{ @biz.create_assign 1, nil }.to raise_error(Biz::ARGUMENTS)
+      assign = @biz.create_assign @p1.id, @m1.id, true
+      expect{ @biz.create_assign nil, 1, true }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.create_assign 1, nil, true }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.create_assign 1, 1, nil }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.create_assign 1, 1, true, 1, nil }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.create_assign 1, 1, true, nil, 1 }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.create_assign 1, 1, false, 1, nil }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.create_assign 1, 1, false, nil, 1 }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.create_assign 1, 1, false, 2, 1 }.to raise_error(Biz::ARGUMENTS)
       expect(assign).to be_a Assign
 
-      #Edit(create and Delete)
+      #Update
+      expect{ @biz.update_assign(assign.id, nil) }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.update_assign(assign.id, true, 1, nil) }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.update_assign(assign.id, true, nil, 1) }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.update_assign(assign.id, false, 1, nil) }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.update_assign(assign.id, false, nil, 1) }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.update_assign(assign.id, false, 2, 1) }.to raise_error(Biz::ARGUMENTS)
+      u_assign = @biz.update_assign(assign.id, false, @p1.start - 1, @p1.last + 1)
+      expect(u_assign).to be_a Assign
+      expect(u_assign.id).to eq assign.id
+      expect(u_assign.sync).to eq false
+
+      #Batch assign(create and Delete)
       delete_list = [assign]
       create_list = [{ projects_id: @p2.id, members_id: @m2.id }]
-      expect{ @biz.edit_assign nil, [] }.to raise_error(Biz::ARGUMENTS)
-      expect{ @biz.edit_assign nil, [{}] }.to raise_error(Biz::ARGUMENTS)
-      expect{ @biz.edit_assign [], nil }.to raise_error(Biz::ARGUMENTS)
-      expect{ @biz.edit_assign [{}], nil }.to raise_error(Biz::ARGUMENTS)
-      created_list = @biz.edit_assign delete_list, create_list
+      expect{ @biz.batch_assign nil, [] }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.batch_assign nil, [{}] }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.batch_assign [], nil }.to raise_error(Biz::ARGUMENTS)
+      expect{ @biz.batch_assign [{}], nil }.to raise_error(Biz::ARGUMENTS)
+      created_list = @biz.batch_assign delete_list, create_list
       expect(created_list).to be_a Array
       expect(created_list[0]).to be_a Assign
       e_assign = created_list[0]
@@ -145,8 +163,8 @@ describe "Biz" do
       @m2 = @biz.create_member "m2"
       @p1 = @biz.create_project("p1", nil, 10, Date.new(2000, 1, 1), Date.new(2000, 2, 28))
       @p2 = @biz.create_project("p2", nil, 10, Date.new(2000, 2, 1), Date.new(2000, 3, 30))
-      @a11 = @biz.create_assign @p1.id, @m1.id
-      @a22 = @biz.create_assign @p2.id, @m2.id
+      @a11 = @biz.create_assign @p1.id, @m1.id, true
+      @a22 = @biz.create_assign @p2.id, @m2.id, true
     end
     after do
       @biz.delete_member(@m1.id)
@@ -233,7 +251,7 @@ describe "Biz" do
 
   end
       ###
-      # TODO:
+      # TODO: need test, but no use
       #   select_all_members
       #   select_all_projects
 

@@ -21,6 +21,8 @@ namespace :db do
         puts "Database migrated."
     end
 
+    # TODO: rollback
+
     desc 'Create a db/schema.rb file that is portable against any DB supported by AR'
     task :schema do
         ActiveRecord::Base.establish_connection(db_config)

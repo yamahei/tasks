@@ -4,7 +4,7 @@
 
     const component = {
         template: '#ASSIGN_MEMBER_DIALOG_TEMPLATE',
-        props: ["visible", "project", "members", "assigns"],
+        props: ["visible", "project", "members", "hash_assigned_members"],
         data: function(){
             return {
                 list: [],//{ id, name, checked }
@@ -15,9 +15,10 @@
                 if(present){
                     const self = this;
                     this.list.splice(0);
+                    const assigned_members = this.hash_assigned_members[this.project.id];
                     const list = this.members.map(function(member){
-                        const assigned = !!self.assigns.find(function(assign){
-                            return member.id === assign.members_id && self.project.id === assign.projects_id;
+                        const assigned = !!assigned_members.find(function(m){
+                            return member.id === m.id;
                         });
                         return {
                             id: member.id,
@@ -39,12 +40,12 @@
             cancel: function(){ this.$emit("cancel"); },
             ok: function(){
                 const self = this;
-                const assigns = this.members.filter(function(member){
+                const assigned_members = this.members.filter(function(member){
                     return !!self.list.find(function(m){
                         return member.id == m.id && m.assigned;
                     });
                 });
-                const obj = { project: this.project, assigns: assigns };
+                const obj = { project: this.project, assigns: assigned_members };
                 this.$emit("regist", obj);
             },
         },

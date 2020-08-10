@@ -138,6 +138,7 @@ section.top-margin {
     position: absolute;
     left: -0.25rem;
     top: 0;
+    z-index: -1;
 }
 *.arrow-right[ui='assign-block']::after, *.arrow-both[ui='assign-block']::after{
     display: inline-block;
@@ -145,6 +146,7 @@ section.top-margin {
     position: absolute;
     right: -0.25rem;
     top: 0;
+    z-index: -1;
 }
 
 *[ui='assigned-member'] {

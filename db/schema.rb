@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200726) do
+ActiveRecord::Schema.define(version: 20200809) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,6 +20,9 @@ ActiveRecord::Schema.define(version: 20200726) do
     t.bigint "members_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.date "start"
+    t.date "last"
+    t.boolean "sync", default: true, null: false
     t.index ["members_id"], name: "index_assigns_on_members_id"
     t.index ["projects_id", "members_id"], name: "index_assigns_on_projects_id_and_members_id", unique: true
     t.index ["projects_id"], name: "index_assigns_on_projects_id"

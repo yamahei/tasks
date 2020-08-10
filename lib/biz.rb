@@ -88,15 +88,29 @@ class Biz
     #
     # Assign
     #
-    def create_assign projects_id, members_id
+    def create_assign projects_id, members_id, sync=nil, start=nil, last=nil
         raise ARGUMENTS if !projects_id
         raise ARGUMENTS if !members_id
+        raise ARGUMENTS if sync == nil
+        raise ARGUMENTS if sync == true && ( start || last )
+        raise ARGUMENTS if sync == false && ( !start || !last )
+        raise ARGUMENTS if ( start && last ) && (last < start)
         begin
             Assign.create(projects_id: projects_id, members_id: members_id)
         rescue ActiveRecord::RecordNotUnique
             raise "プロジェクト重複"
         end
-
+    end
+    def update_assign id, sync=nil, start=nil, last=nil#projects_id, members_idは更新しない！
+        raise ARGUMENTS if !id
+        raise ARGUMENTS if sync == nil
+        raise ARGUMENTS if sync == true && ( start || last )
+        raise ARGUMENTS if sync == false && ( !start || !last )
+        raise ARGUMENTS if ( start && last ) && (last < start)
+        db_assign = Assign.find_by_id(id)
+        raise NOT_FOUND if !db_assign
+        db_assign.update(id: id, sync: sync, start: start, last: last)
+        db_assign
     end
     def delete_assign id #=>nil
         raise ARGUMENTS if !id
@@ -105,7 +119,7 @@ class Biz
         db_assign.destroy
         nil
     end
-    def edit_assign delete_list, create_list
+    def batch_assign delete_list, create_list#ATTENTION: force sync=true
         raise ARGUMENTS if !delete_list
         raise ARGUMENTS if !delete_list.instance_of?(Array)
         raise ARGUMENTS if !delete_list.all?{|e| e[:id] ? true : false }
@@ -117,7 +131,7 @@ class Biz
                 delete_assign(item[:id])
             }
             create_list.map{|item| #returns created assigns
-                create_assign(item[:projects_id], item[:members_id])
+                create_assign(item[:projects_id], item[:members_id], true)
             }
         end
     end

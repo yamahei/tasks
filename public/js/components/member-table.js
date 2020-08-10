@@ -4,7 +4,7 @@
 
     const component = {
         template: '#MEMBER_TABLE_TEMPLATE',
-        props: ["member", "basedate", "assigns", "hash_projects", "scroll_x", "a_day_width"],
+        props: ["member", "basedate", "hash_assigned_projects", "scroll_x", "a_day_width"],
         data: function(){
             return {};
         },
@@ -24,19 +24,7 @@
         },
         computed: {
             assigned_projects: function(){
-                const self = this;
-                const member = this.member;
-                const assigns = this.assigns.filter(function(assign){
-                    return assign.members_id == member.id;
-                })
-                const projects = assigns.map(function(assign){
-                    return self.hash_projects[assign.projects_id];
-                }).sort(function(a, b){
-                    const start = (+new Date(a.start)) - (+new Date(b.start));
-                    const last = (+new Date(a.last)) - (+new Date(b.last));
-                    return start || last || 0;
-                });
-                return projects;
+                return this.hash_assigned_projects[this.member.id];
             },
         },
         beforeMount: function(){},

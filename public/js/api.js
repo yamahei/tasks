@@ -102,10 +102,15 @@
     };
 
     //Assign
-    api.prototype.append_assign = function(projects_id, members_id){
+    api.prototype.append_assign = function(projects_id, members_id, sync, start, last){
         const url = ASSIGN_BASE_URI;
-        const params = { projects_id: projects_id, members_id: members_id };
+        const params = { projects_id: projects_id, members_id: members_id, sync: sync, start: start, last: last };
         return axios.put(url, params);
+    };
+    api.prototype.update_assign = function(id, sync, start, last){
+        const url = ASSIGN_BASE_URI;
+        const params = { id: id, sync: sync, start: start, last: last };
+        return axios.post(url, params);
     };
     api.prototype.delete_assign = function(id){
         const url = ASSIGN_BASE_URI;
@@ -113,7 +118,7 @@
         params.append("id", id);
         return axios.delete(url, {data: params});
     };
-    api.prototype.edit_assign = function(delete_list, create_list){
+    api.prototype.batch_assign = function(delete_list, create_list){
         const url = `${ASSIGN_BASE_URI}/edit`;
         const params = {
             delete_list: delete_list,
@@ -121,8 +126,6 @@
         }
         return axios.post(url, params);
     };
-    
-
 
     g.API = new api();
 

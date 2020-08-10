@@ -139,8 +139,20 @@ class MyApp < Sinatra::Base
         validates{ params{
             required(:projects_id).filled(:integer)
             required(:members_id).filled(:integer)
+            required(:sync).filled(:boolean)
+            optional(:start).maybe(:date)
+            optional(:last).maybe(:date)
         }}
-        biz.create_assign(params[:projects_id], params[:members_id]).to_json
+        biz.create_assign(params[:projects_id], params[:members_id], params[:sync], params[:start], params[:last]).to_json
+    end
+    post '/api/assigns' do
+        validates{ params{
+            required(:id).filled(:integer)
+            required(:sync).filled(:boolean)
+            optional(:start).maybe(:date)
+            optional(:last).maybe(:date)
+        }}
+        biz.update_assign(params[:id], params[:sync], params[:start], params[:last]).to_json
     end
     delete '/api/assigns' do
         validates{ params{
@@ -159,7 +171,7 @@ class MyApp < Sinatra::Base
             required(:delete_list).value(:array).each(assign_type)
             required(:create_list).value(:array).each(assign_type)
         }}
-        biz.edit_assign(params[:delete_list], params[:create_list]).to_json
+        biz.batch_assign(params[:delete_list], params[:create_list]).to_json
     end
 
 end

@@ -4,7 +4,7 @@
 
     const component = {
         template: '#PROJECT_TABLE_TEMPLATE',
-        props: ["project", "basedate", "assigns", "hash_members", "scroll_x", "a_day_width"],
+        props: ["project", "basedate", "hash_assigned_members", "scroll_x", "a_day_width"],
         data: function(){
             return {};
         },
@@ -24,15 +24,7 @@
         },
         computed: {
             assigned_members: function(){
-                const self = this;
-                const project = this.project;
-                const assigns = this.assigns.filter(function(assign){
-                    return assign.projects_id == project.id;
-                })
-                const members = assigns.map(function(assign){
-                    return self.hash_members[assign.members_id];
-                });
-                return members;
+               return this.hash_assigned_members[this.project.id];
             },
             project_style: function(){
                 const basedate = this.basedate;
@@ -73,9 +65,9 @@
         beforeMount: function(){},
         mounted: function(){},
         methods: {
-            assign_member: function(){
-                this.$emit("assign", this.project);
-            },
+            // assign_member: function(){
+            //     this.$emit("assign", this.project);
+            // },
         },
     };
 

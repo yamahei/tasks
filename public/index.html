@@ -233,10 +233,10 @@
 
 <script type="text/x-template" id="PROJECT_TABLE_TEMPLATE">
     <div ui="assign-block" :style="project_style" :class="project_class" ref="content">
-        <br/>
+        <!--<br/>
         <button class="button is-small" @click="assign_member">
             <span class="icon is-small"><i class="fa fa-users"></i></span>
-        </button>
+        </button>-->
         <div ui="assigned-member" v-for="member in assigned_members" v-bind:key="member.id">
             {{ member.name }}
         </div>
@@ -387,18 +387,23 @@
                 </div>
                 <div ui="table-row" class="columns has-bottom" v-bind:key="project.id" v-if="is_group_open(project)">
                     <table-title>
-                        <p class="is-size-4">{{ get_project_name(project) }}</p>
-                        <p class="is-size-7 link-like-text" @click="edit_project(project)">description</p>
+                        <p>
+                            <span class="is-size-4">{{ get_project_name(project) }}</span>
+                            <button class="button is-small" @click="edit_project(project)">
+                                <span class="icon is-small"><i class="fa fa-edit"></i></span>
+                            </button>
+                            <button class="button is-small" @click="assign_member(project)">
+                                <span class="icon is-small"><i class="fa fa-user-plus"></i></span>
+                            </button>
+                        </p>
                     </table-title>
                     <table-body class="white-scroll" :canvas_width="canvas_width" v-scroll="on_table_scroll">
                         <project-table
                             :project="project"
                             :basedate="basedate"
-                            :assigns="assigns"
-                            :hash_members="hash_members"
+                            :hash_assigned_members="hash_assigned_members"
                             :scroll_x="scroll_x"
                             :a_day_width="a_day_width"
-                            @assign="assign_member"
                         ></project-table>
                     </table-body>
                 </div>
@@ -407,15 +412,18 @@
             <template v-if="mode_is_member" v-for="member in members" v-bind:key="member.id">
                 <div ui="table-row" class="columns has-bottom">
                     <table-title>
-                        <p class="is-size-4">{{ member.name }}</p>
-                        <p class="is-size-7 link-like-text" @click="edit_member(member)">description</p>
+                        <p>
+                            <span class="is-size-4">{{ member.name }}</span>
+                            <button class="button is-small" @click="edit_member(member)">
+                                <span class="icon is-small"><i class="fa fa-edit"></i></span>
+                            </button>
+                        </p>
                     </table-title>
                     <table-body class="white-scroll" :canvas_width="canvas_width" v-scroll="on_table_scroll">
                         <member-table
                             :member="member"
                             :basedate="basedate"
-                            :assigns="assigns"
-                            :hash_projects="hash_projects"
+                            :hash_assigned_projects="hash_assigned_projects"
                             :scroll_x="scroll_x"
                             :a_day_width="a_day_width"
                             @assign="assign_member"
@@ -459,7 +467,7 @@
         :visible="dialog.assign_member.visible"
         :project="dialog.assign_member.project"
         :members="members"
-        :assigns="assigns"
+        :hash_assigned_members="hash_assigned_members"
         @regist="on_regist_assign_member"
         @cancel="close_assign_member_dialog"
     ></assign-member-dialog>

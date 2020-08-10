@@ -80,6 +80,21 @@
                 });
                 return obj;
             },
+            hash_assigned_members: function(){//=>{ projects_id: [member, ..] }
+                const obj = {};
+                const self = this;
+                this.projects.forEach(function(project){
+                    const assigns = self.assigns.filter(function(assign){
+                        return assign.projects_id == project.id;
+                    });
+                    obj[project.id] = assigns.map(function(assign){//重複ないはず
+                        return self.members.find(function(member){
+                            return assign.members_id == member.id;
+                        });
+                    });
+                });
+                return obj;
+            },
             hash_projects: function(){
                 if(!this.projects){ return null; }
                 //reduceだとなんか変なので泥臭くやる
@@ -88,8 +103,23 @@
                     obj[project.id] = project;
                 });
                 return obj;
-
             },
+            hash_assigned_projects: function(){//=>{ members_id: [project, ..] }
+                const obj = {};
+                const self = this;
+                this.members.forEach(function(member){
+                    const assigns = self.assigns.filter(function(assign){
+                        return assign.members_id == member.id;
+                    });
+                    obj[member.id] = assigns.map(function(assign){//重複ないはず
+                        return self.projects.find(function(project){
+                            return assign.projects_id == project.id;
+                        });
+                    });
+                });
+                return obj;
+            },
+
             mode_is_project: function(){ return !!(this.mode == MODE_PROJECT); },
             mode_is_member: function(){ return !!(this.mode == MODE_MEMBER); },
             sorted_projects: function(){
@@ -275,7 +305,7 @@
                         return assign.projects_id == item.projects_id && assign.members_id == item.members_id;
                     });
                 });
-                API.edit_assign(deletes, append_list)
+                API.batch_assign(deletes, append_list)
                 .then(function(response){
                     appendeds = response.data;
                     deletes.forEach(function(assign){
