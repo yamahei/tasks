@@ -126,7 +126,7 @@ section.top-margin {
 }
 *[ui='assign-block']{
     margin: 0; margin-bottom: 0.25rem;
-    padding: 0.5rem 1rem;
+    padding: 1rem;
     background-image: url("line.png");
     background-position: left top;
     background-repeat: repeat-x;

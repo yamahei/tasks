@@ -246,7 +246,6 @@
 <script type="text/x-template" id="MEMBER_TABLE_TEMPLATE">
     <div ui="member_project_container" ref="content">
         <div ui="assign-block" :style="get_project_style(project)" :class="get_project_class(project)" v-for="project in assigned_projects" v-bind:key="project.id">
-            <br/>
             <button class="button is-small" @click="assign_member(project)">
                 <span class="icon is-small"><i class="fa fa-users"></i></span>
             </button>
