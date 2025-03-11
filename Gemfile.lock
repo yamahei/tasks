@@ -75,7 +75,7 @@ GEM
       ruby2_keywords (~> 0.0.1)
     mutex_m (0.2.0)
     pg (1.2.3)
-    rack (2.2.9)
+    rack (2.2.13)
     rack-contrib (2.5.0)
       rack (< 4)
     rack-protection (2.2.3)
